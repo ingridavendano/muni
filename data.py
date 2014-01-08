@@ -5,14 +5,20 @@
 # Grab a transit stop data that matches each stop to a geolocation.           #
 # --------------------------------------------------------------------------- #
 
+import json
 import requests
 from StringIO import StringIO
 import xml.etree.ElementTree as ET
 
-# --------------------------------------------------------------------------- #\
-# variables for 511 transit data 
+# --------------------------------------------------------------------------- #
 
-token = "4bba4c2d-55eb-4ee4-96fd-4f2743484605"
+# grab API key from SF Bay Area transit site http://511.org/
+config_file = open("./config.json")
+config_data = json.load(config_file) 
+config_file.close()
+
+# variables from 511 transit data 
+token = config_data["511_API_KEY"]
 service = [
     "GetAgencies",
     "GetRoutesForAgencies",
@@ -33,22 +39,24 @@ agency = [
     "WESTCAT"
     ]
 
-# --------------------------------------------------------------------------- #
-# making all the variables website friendly 
-
+# convert variables to website friendly 
 website = "http://services.my511.org/Transit2.0/"
 token = "?token="+token
 service = [service[i]+".aspx" for i in range(len(service))]
-agency = ["&agencyName="+agency[i] for i in range(len(agency))]
+set_agency = ["&agencyName="+agency[i] for i in range(len(agency))]
 
 # --------------------------------------------------------------------------- #
 
 def grab_sf_muni_data():
-    response = requests.get(website + service[2] + token + agency[5])
+    response = requests.get(website + service[2] + token + set_agency[5])
     xml = StringIO(response.text)
-    tree = ET.parse(xml)
-    for child in tree.getroot()
 
+    # real time transit for SF-MUNI
+    rtt = ET.parse(xml).getroot()
+    routes = rtt[0][0][0]
+
+    for route in routes:
+        print route.get("Name"), route.get("Code")
 
 
 

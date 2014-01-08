@@ -7,12 +7,19 @@
 
 import os
 from flask import Flask, render_template, request
+import json
 
 # --------------------------------------------------------------------------- #
 
 app = Flask(__name__)
 app.secret_key = "uber_challenge"
-GOOGLE_MAPS_TOKEN = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+# grab Google Maps API
+config_file = open("./config.json")
+config_data = json.load(config_file) 
+config_file.close()
+
+GOOGLE_MAPS_TOKEN = config_data["GOOGLE_MAPS_API"]
 
 # --------------------------------------------------------------------------- #
 
