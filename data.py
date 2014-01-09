@@ -47,7 +47,23 @@ set_agency = ["&agencyName="+agency[i] for i in range(len(agency))]
 
 # --------------------------------------------------------------------------- #
 
-def grab_sf_muni_data():
+def sf_muni_stops(route_code):
+    """ Provides the name and code for each stop on a route. """
+
+    set_route = "&routeIDF=" + agency[5] + "~" + route_code + "~Inbound"
+    response = requests.get(website + service[3] + token + set_route)
+    xml = StringIO(response.text)
+
+    rtt = ET.parse(xml).getroot()
+    stops = rtt[0][0][0][0][0][0][0]
+
+    for stop in stops:
+        print stop.get("name"), stop.get("StopCode")
+
+
+def sf_muni_routes():
+    """ Grabs list of SF-MUNI routes with name and direction. """
+
     response = requests.get(website + service[2] + token + set_agency[5])
     xml = StringIO(response.text)
 
@@ -56,11 +72,10 @@ def grab_sf_muni_data():
     routes = rtt[0][0][0]
 
     for route in routes:
-        print route.get("Name"), route.get("Code")
-
+        sf_muni_stops(route.get("Code"))
 
 
 # --------------------------------------------------------------------------- #
 
 if __name__ == "__main__":
-    grab_sf_muni_data()
+    sf_muni_routes()
