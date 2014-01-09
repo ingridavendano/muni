@@ -1,5 +1,5 @@
-San Francisco Transit Departure Times App
-=========================================
+SF Transit Departure Times App
+==============================
 
 Web application that provides public transportation departures for MUNI and BART around San Francisco based on the location of a user.
 
