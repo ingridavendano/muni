@@ -48,6 +48,7 @@ set_agency = ["&agencyName="+agency[i] for i in range(len(agency))]
 # --------------------------------------------------------------------------- #
 xml_locations = {}
 codes = []
+in_codes = []
 
 if __name__ == "__main__":
     f = open("muni_transit_stops.txt", "w")
@@ -68,8 +69,18 @@ if __name__ == "__main__":
             code = stop.get("StopCode")
             name = stop.get("name")
             # print stop.get("StopCode"), stop.get("name")
+
+
             if code not in codes:
                 codes.append(code)
+
+                if direction == "~Inbound":
+                    in_codes.append(code)
+
+            if direction == "~Outbound":
+                if code in in_codes:
+                    print "!"*80
+                    print code, name
 
             xml_locations[code] = name
             
@@ -89,7 +100,7 @@ if __name__ == "__main__":
         routes = rtt[0][0][0]
 
         for route in routes:
-            print route.get("Code")
+            # print route.get("Code")
             sf_muni_stops(route.get("Code"), "~Inbound")
             if route.get("Code") != "81X" and route.get("Code") != "80X":
                 sf_muni_stops(route.get("Code"), "~Outbound")
@@ -126,14 +137,19 @@ if __name__ == "__main__":
     sf_muni_routes()
 
     codes = sorted(codes)
+    largest = 0
 
     for c in codes:
         n = xml_locations[c]
+        if len(n) > largest:
+            largest = len(n)
 
         line = c + ", " + n + "\n"
         f.write(line)
 
     f.close()
+    print  "#"*80
+    print largest
 
 
 
