@@ -2,9 +2,10 @@
 # seed.py                                                                     #
 # Created by Ingrid Avendano 1/8/14.                                          #
 # --------------------------------------------------------------------------- #
-# Populate the transit.db with MUNI locations with latitudes and longitudes.  # 
+# Populate the transit.db with MUNI locations with latitudes and longitudes.  #
 # --------------------------------------------------------------------------- #
 
+# import model
 import json
 import requests
 from StringIO import StringIO
@@ -47,15 +48,24 @@ set_agency = ["&agencyName="+agency[i] for i in range(len(agency))]
 
 # --------------------------------------------------------------------------- #
 
+txt_locations = {}
+xml_locations = {}
+
+# --------------------------------------------------------------------------- #
+
 def load_transit_stops():
     """ Adds stopcode, name, location by latitude and longitude. """
+
 
     with open("./data/stops.txt") as datafile:
         transit_stops = datafile.readlines()
 
         for stop in transit_stops:
             stop = stop.split(",")
-            print stop[0], stop[1]
+
+            if stop[0] != "stop_id":
+                code = int(stop[0])
+                txt_locations[code] = (stop[3], stop[4])
 
 
 def sf_muni_stops(route_id, direction):
@@ -69,14 +79,11 @@ def sf_muni_stops(route_id, direction):
         stops = rtt[0][0][0][0][0][0][0]
 
         for stop in stops:
-            code = stop.get("StopCode")
+            code = int(stop.get("StopCode")[-4:])
             name = stop.get("name")
-            # print stop.get("StopCode"), stop.get("name")
-            if code not in codes:
-                codes.append(code)
 
             xml_locations[code] = name
-            
+
 
 def sf_muni_routes():
     """ Gets XML list of SF-MUNI routes with name and direction frmo 511. """
@@ -97,8 +104,51 @@ def sf_muni_routes():
         # grab outbound stops, but 81X and 80X don't have outbound stops
         if route.get("Code") != "81X" and route.get("Code") != "80X":
             sf_muni_stops(route_id, "~Outbound")
+
+
+def read_stops_from_text_file():
+    locations = {}
+
+    with open("./data/stops.txt") as datafile:
+        stops = datafile.readlines()
+
+        for stop in stops:
+            stop = stop.split(",")
+
+            if stop[0] != "stop_id":
+                code = int(stop[0])
+                txt_locations[code] = (stop[3], stop[4])
+
+def load_stops(db_session):
+
+    
+
+
+    return db_session
+
 # --------------------------------------------------------------------------- #
 
+def main(db_session):
+    db_session = load_stops(db_session)
+    db_session.commit()
 
 if __name__ == "__main__":
     load_transit_stops()
+    sf_muni_routes()
+    print "size of stops:", len(xml_locations), len(txt_locations)
+    
+
+    f = open("muni_stops.txt", "w")
+
+    for key, value in xml_locations.iteritems():
+
+        if key in txt_locations.keys():
+            line = str(key) + ", " + value + ", " +  txt_locations[key][0]+ ", " +  txt_locations[key][0] +"\n"
+            f.write(line)
+        else:
+            print key, value
+
+
+
+    f.close()
+
