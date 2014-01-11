@@ -1,17 +1,18 @@
-# --------------------------------------------------------------------------- #
-# seed.py                                                                     #
-# Created by Ingrid Avendano 1/8/14.                                          #
-# --------------------------------------------------------------------------- #
-# Populate the transit.db with MUNI locations with latitudes and longitudes.  #
-# --------------------------------------------------------------------------- #
+# -----------------------------------------------------------------------------
+# seed.py 
+# Created by Ingrid Avendano 1/8/14. 
+# -----------------------------------------------------------------------------
+# Populate the muni.db with geo-locations of every MUNI stop.
+# -----------------------------------------------------------------------------
 
-# import model
+import re
+import model
 import json
 import requests
 from StringIO import StringIO
 import xml.etree.ElementTree as ET
 
-# --------------------------------------------------------------------------- #
+# -----------------------------------------------------------------------------
 
 # grab API key from SF Bay Area transit site http://511.org/
 config_file = open("./config.json")
@@ -46,48 +47,35 @@ token = "?token="+token
 service = [service[i]+".aspx" for i in range(len(service))]
 set_agency = ["&agencyName="+agency[i] for i in range(len(agency))]
 
-# --------------------------------------------------------------------------- #
+# -----------------------------------------------------------------------------
 
-txt_locations = {}
-xml_locations = {}
+def read_xml_of_stops(route_id, direction, locations):
+    """ Gets XML of name and code for each stop on a route from 511. """
 
-# --------------------------------------------------------------------------- #
+    set_route = "&routeIDF=" + agency[5] + "~" + route_id + direction
+    response = requests.get(website + service[3] + token + set_route)
+    xml = StringIO(response.text)
 
-def load_transit_stops():
-    """ Adds stopcode, name, location by latitude and longitude. """
+    rtt = ET.parse(xml).getroot()
+    stops = rtt[0][0][0][0][0][0][0]
 
+    for stop in stops:
+        code = stop.get("StopCode")
 
-    with open("./data/stops.txt") as datafile:
-        transit_stops = datafile.readlines()
+        # cleaning up the data of the names for each stop
+        name = stop.get("name")
+        name = re.sub("  and  ", " & ", name)
+        name = re.sub("Street", "St", name)
+        name = re.sub(" Of ", " of ", name)
+        name = re.sub("C Chavez", "Cesar Chavez", name)
 
-        for stop in transit_stops:
-            stop = stop.split(",")
+        locations[code] = name
 
-            if stop[0] != "stop_id":
-                code = int(stop[0])
-                txt_locations[code] = (stop[3], stop[4])
-
-
-def sf_muni_stops(route_id, direction):
-        """ Gets XML of name and code for each stop on a route from 511. """
-
-        set_route = "&routeIDF=" + agency[5] + "~" + route_id + direction
-        response = requests.get(website + service[3] + token + set_route)
-        xml = StringIO(response.text)
-
-        rtt = ET.parse(xml).getroot()
-        stops = rtt[0][0][0][0][0][0][0]
-
-        for stop in stops:
-            code = int(stop.get("StopCode")[-4:])
-            name = stop.get("name")
-
-            xml_locations[code] = name
+    return locations
 
 
-def sf_muni_routes():
+def read_xml_of_routes():
     """ Gets XML list of SF-MUNI routes with name and direction frmo 511. """
-
     response = requests.get(website + service[2] + token + set_agency[5])
     xml = StringIO(response.text)
 
@@ -95,60 +83,68 @@ def sf_muni_routes():
     rtt = ET.parse(xml).getroot()
     routes = rtt[0][0][0]
 
+    locations = {}
+
     for route in routes:
         route_id = route.get("Code")
 
         # grab inbound stops
-        sf_muni_stops(route_id, "~Inbound")
+        locations = read_xml_of_stops(route_id, "~Inbound", locations)
 
         # grab outbound stops, but 81X and 80X don't have outbound stops
-        if route.get("Code") != "81X" and route.get("Code") != "80X":
-            sf_muni_stops(route_id, "~Outbound")
+        if route_id != "81X" and route_id != "80X":
+            locations = read_xml_of_stops(route_id, "~Outbound", locations)
+
+    return locations
 
 
-def read_stops_from_text_file():
+def read_txt_of_stops():
+    """ Get stops with tuples of latitude and longitudefrom from txt file. """
     locations = {}
 
-    with open("./data/stops.txt") as datafile:
-        stops = datafile.readlines()
+    with open("./data/stops.txt") as stopdata:
+        stops = stopdata.readlines()
 
         for stop in stops:
             stop = stop.split(",")
+            try: 
+                stop_id = int(stop[0])
+                locations[stop_id] = (stop[3], stop[4])
+            except ValueError:
+                pass
 
-            if stop[0] != "stop_id":
-                code = int(stop[0])
-                txt_locations[code] = (stop[3], stop[4])
+    return locations
 
-def load_stops(db_session):
 
-    
+def load_stops(db_session, debug=False):
+    """ Loads information about each MUNI stop into the database. """
+    locations = read_txt_of_stops()
+    stops = read_xml_of_routes()
 
+    for code in stops.keys(): 
+        stop_id = int(code[-4:])
+
+        if debug: 
+            print code, stops[code], locations[stop_id]
+
+        new_stop = model.Stop(
+            code=code, 
+            location=stops[code], 
+            latitude=locations[stop_id][0], 
+            longitude=locations[stop_id][1]
+            )
+        db_session.add(new_stop)
 
     return db_session
 
-# --------------------------------------------------------------------------- #
+# -----------------------------------------------------------------------------
 
 def main(db_session):
+    db_session = model.connect()
     db_session = load_stops(db_session)
     db_session.commit()
 
+
 if __name__ == "__main__":
-    load_transit_stops()
-    sf_muni_routes()
-    print "size of stops:", len(xml_locations), len(txt_locations)
+    main()
     
-
-    f = open("muni_stops.txt", "w")
-
-    for key, value in xml_locations.iteritems():
-
-        if key in txt_locations.keys():
-            line = str(key) + ", " + value + ", " +  txt_locations[key][0]+ ", " +  txt_locations[key][0] +"\n"
-            f.write(line)
-        else:
-            print key, value
-
-
-
-    f.close()
-
