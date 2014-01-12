@@ -1,3 +1,27 @@
 {% extends 'master.html' %}
-    {% block body %}
-    {% endblock %}
+{% block body %}
+    <p>
+        hello
+    </p>
+
+    <script type="text/javascript">
+        function success(position) {
+            latitutde = position.coords.latitude;
+            longitude = position.coords.longitude;
+
+            console.log(latitutde);
+            console.log(longitude);
+        }
+
+        function error(msg) {
+            console.log(msg)
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(success, error);
+        } else {
+            error("NOT WORKING!");
+        }
+    </script>
+
+{% endblock %}

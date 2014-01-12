@@ -19,13 +19,20 @@ config_file = open("./config.json")
 config_data = json.load(config_file) 
 config_file.close()
 
-GOOGLE_MAPS_TOKEN = config_data["GOOGLE_MAPS_API"]
+GOOGLE_MAPS_TOKEN = config_data["GOOGLE_API_KEY"]
 
 # -----------------------------------------------------------------------------
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("master.html", token=GOOGLE_MAPS_TOKEN)
+    return render_template("index.html")
+
+
+@app.route("/map", methods=["GET"])
+def map():
+    return render_template("map.html", token=GOOGLE_MAPS_TOKEN)
 
 # -----------------------------------------------------------------------------
 
+if __name__ == "__main__":
+    app.run(debug=True)
