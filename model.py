@@ -31,6 +31,7 @@ Base.query = db_session.query_property()
 
 
 def connect():
+    """ Use this function to connect to database for seed.py file. """
     global ENGINE
     global Session
 
