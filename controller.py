@@ -32,6 +32,15 @@ def index():
 def map():
     return render_template("map.html", token=GOOGLE_MAPS_TOKEN)
 
+
+@app.route("/getTimes.json", methods=["GET"])
+def geo():
+    longitude = request.args.get('lon')
+    latitude = request.args.get('lat')
+
+    print latitude, longitude
+    return '{"text":"I am JSON"}'
+
 # -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
