@@ -129,9 +129,9 @@ def load_stops(db_session, debug=False):
 
         new_stop = model.Stop(
             code=code, 
-            location=stops[code], 
-            latitude=locations[stop_id][0], 
-            longitude=locations[stop_id][1]
+            address=stops[code], 
+            lat=locations[stop_id][0], 
+            lng=locations[stop_id][1]
             )
         db_session.add(new_stop)
 
@@ -139,7 +139,7 @@ def load_stops(db_session, debug=False):
 
 # -----------------------------------------------------------------------------
 
-def main(db_session):
+def main():
     db_session = model.connect()
     db_session = load_stops(db_session)
     db_session.commit()

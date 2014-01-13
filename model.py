@@ -14,13 +14,13 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 # To create a new database, first follow the steps below in the console:
 #
 # python -i model.py
-# >>> engine = create_engine("sqlite:///muni.db", echo=True)
+# >>> engine = create_engine("mysql://root@localhost/stops", echo=True)
 # >>> Base.metadata.create_all(engine)
 # 
 # Then run seed.py file to populate the database with stop geolocations.
 # -----------------------------------------------------------------------------
 
-ENGINE = create_engine("sqlite:///muni.db", echo=False)
+ENGINE = create_engine("mysql://root@localhost/stops", echo=False)
 db_session = scoped_session(sessionmaker(
     bind=ENGINE, 
     autocommit=False, 
@@ -35,7 +35,7 @@ def connect():
     global ENGINE
     global Session
 
-    ENGINE = create_engine("sqlite:///muni.db", echo=False)
+    ENGINE = create_engine("mysql://root@localhost/stops", echo=False)
     Session = scoped_session(sessionmaker(
         bind=ENGINE, 
         autocommit=False, 
@@ -54,19 +54,19 @@ def connect():
 # -----------------------------------------------------------------------------
 
 class Stop(Base):
-    __tablename__ = "stops"
+    __tablename__ = "muni"
 
     id = Column(Integer, primary_key=True)
     code = Column(String(6), nullable=False)
-    location = Column(String(40), nullable=False)
-    latitude = Column(Integer, nullable=False)
-    longitude = Column(Integer, nullable=False)
+    address = Column(String(40), nullable=False)
+    lat = Column(Integer, nullable=False)
+    lng = Column(Integer, nullable=False)
 
 # -----------------------------------------------------------------------------
 
-def create_stop(code, name, lat, long):
+def create_stop(code, name, latitude, longitude):
     """ Creates new MUNI stop in database. """
-    new_stop = Stop(code=code, name=name, latitude=lat, longitude=lon)
+    new_stop = Stop(code=code, address=name, lat=latitude, lng=longitude)
     db_session.add(new_stop)
     db_session.commit()
     return
