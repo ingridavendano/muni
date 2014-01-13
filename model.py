@@ -9,6 +9,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, Float, String
 from sqlalchemy.orm import sessionmaker, scoped_session
+import json
+import requests
+from StringIO import StringIO
+import xml.etree.ElementTree as ET
 
 # -----------------------------------------------------------------------------
 # To create a new database, first follow the steps below in the console:
@@ -78,10 +82,37 @@ def get_stop(code):
     return stop
 
 
-def geo_fencing_for_nearest_stop(latitude, longitude):
-    """ Finds closest MUNI stop in database by a user's geolocation. """
+def get_stop_departure_times(code):
+    """ Gets list of departure times from XML from 511. """
 
-    # equation based on Haversine formula
+    # grab API key from SF Bay Area transit site http://511.org/
+    config_file = open("./config.json")
+    config_data = json.load(config_file) 
+    config_file.close()
+
+    website = "http://services.my511.org/Transit2.0/"
+    token = "?token="+config_data["511_API_KEY"]
+    service = "GetNextDeparturesByStopCode.aspx"
+    stop = "&stopcode=" + code
+
+    response = requests.get(website + service + token + stop)
+    xml = StringIO(response.text)
+
+    rtt = ET.parse(xml).getroot()
+    routes = rtt[0][0][0]
+
+    for route in routes:
+        print "#"*80
+        print route.get("Name")
+        print route[0][0].get("Name")
+        times = [time.text for time in route[0][0][0][0][0]]
+        print times
+
+
+
+
+def geo_fencing_for_nearest_stops(latitude, longitude):
+    """ Finds closest MUNI stop in database by a user's geolocation. """
     equation = "".join(["( 3959 * acos( cos( radians(",
         latitude,
         ") ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(",
@@ -91,23 +122,18 @@ def geo_fencing_for_nearest_stop(latitude, longitude):
         ") ) * sin( radians( lat ) ) ) )"
     ])
 
+    # equation based on Haversine formula
     search = "".join(["SELECT * FROM muni WHERE ",
         equation, 
         " < 5 ORDER BY ",
         equation,
         " LIMIT 0 , 4"
     ])
-    search = "".join(search)
+
+
     
     stops = db_session.query(Stop).from_statement(search).all()
-    print "*"*80
 
-    for stop in stops:
-        print stop.code, stop.address, stop.lat, stop.lng
+    get_stop_departure_times(stops[0].code)
 
-
-
-
-
-
-
+    return stops

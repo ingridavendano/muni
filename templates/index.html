@@ -4,14 +4,31 @@
         hello
     </p>
 
+    {% if display is defined %}
+        <!-- <p>test</p> -->
+        <!-- <p>{{ stop }}</p> -->
+        <!-- {% for stop in stops %}
+            <li>stop.address</li>
+        {% endfor %} -->
+        <span id="dt">test</span>
+    {% endif %}
+
+
     <script type="text/javascript">
         function success(position) {
             latitude = position.coords.latitude;
             longitude = position.coords.longitude;
 
-            $.ajax({
-                url: "getTimes.json?lat=" + latitude + "&lon=" + longitude
-            })
+            $.getJSON(
+                "getTimes.json",
+                {lat: latitude, lng: longitude}, 
+                function(json) {
+                    console.log(json.code);
+                } 
+            )
+            // $.ajax({
+            //     url: "getTimes.json?lat=" + latitude + "&lng=" + longitude
+            // })
             console.log(latitude);
             console.log(longitude);
         }
@@ -25,6 +42,15 @@
         } else {
             error("NOT WORKING!");
         }
+    </script>
+
+    <script type="text/javascript">
+        {% if display is defined %}
+            var dt = document.querySelector("#dt");
+            dt.innerHTML = {{ stop }}
+        {% endif %}
+
+
     </script>
 
 {% endblock %}

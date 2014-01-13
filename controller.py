@@ -7,7 +7,7 @@
 
 import model
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 import json
 
 # -----------------------------------------------------------------------------
@@ -26,7 +26,14 @@ GOOGLE_MAPS_TOKEN = config_data["GOOGLE_API_KEY"]
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")
+    if session.get("location") and session.get("code"):
+        return render_template("index.html", 
+            display=True, 
+            stop=session["code"], 
+            location=session["location"]
+            )
+    else: 
+        return render_template("index.html", display=False, stop="", location="")
 
 
 @app.route("/map", methods=["GET"])
@@ -36,12 +43,19 @@ def map():
 
 @app.route("/getTimes.json", methods=["GET"])
 def geo():
-    longitude = request.args.get('lon')
     latitude = request.args.get('lat')
+    longitude = request.args.get('lng')
 
-    print latitude, longitude
-    model.geo_fencing_for_nearest_stop(latitude, longitude)
-    return '{"text":"I am JSON"}'
+    session["location"] = (latitude, longitude)
+    stops = model.geo_fencing_for_nearest_stops(latitude, longitude)
+    print "*"*80
+    print stops[0].address
+    print "*"*80
+    session["code"] = stops[0].code
+
+    data = "".join(['{"code":',stops[0].code,'}'])
+
+    return data
 
 # -----------------------------------------------------------------------------
 
