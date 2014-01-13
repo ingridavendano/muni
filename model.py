@@ -7,7 +7,7 @@
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, Float, String
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 # -----------------------------------------------------------------------------
@@ -59,8 +59,8 @@ class Stop(Base):
     id = Column(Integer, primary_key=True)
     code = Column(String(6), nullable=False)
     address = Column(String(40), nullable=False)
-    lat = Column(Integer, nullable=False)
-    lng = Column(Integer, nullable=False)
+    lat = Column(Float, nullable=False)
+    lng = Column(Float, nullable=False)
 
 # -----------------------------------------------------------------------------
 
@@ -76,3 +76,38 @@ def get_stop(code):
     """ Return stop based on stopcode. """
     stop = db_session.query(Stop).filter(Stop.code == code).one()
     return stop
+
+
+def geo_fencing_for_nearest_stop(latitude, longitude):
+    """ Finds closest MUNI stop in database by a user's geolocation. """
+
+    # equation based on Haversine formula
+    equation = "".join(["( 3959 * acos( cos( radians(",
+        latitude,
+        ") ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(",
+        longitude,
+        ") ) + sin( radians(",
+        latitude,
+        ") ) * sin( radians( lat ) ) ) )"
+    ])
+
+    search = "".join(["SELECT * FROM muni WHERE ",
+        equation, 
+        " < 5 ORDER BY ",
+        equation,
+        " LIMIT 0 , 4"
+    ])
+    search = "".join(search)
+    
+    stops = db_session.query(Stop).from_statement(search).all()
+    print "*"*80
+
+    for stop in stops:
+        print stop.code, stop.address, stop.lat, stop.lng
+
+
+
+
+
+
+

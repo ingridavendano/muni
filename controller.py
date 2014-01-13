@@ -5,6 +5,7 @@
 # Contols different views and runs model depending on the view. 
 # -----------------------------------------------------------------------------
 
+import model
 import os
 from flask import Flask, render_template, request
 import json
@@ -39,6 +40,7 @@ def geo():
     latitude = request.args.get('lat')
 
     print latitude, longitude
+    model.geo_fencing_for_nearest_stop(latitude, longitude)
     return '{"text":"I am JSON"}'
 
 # -----------------------------------------------------------------------------
