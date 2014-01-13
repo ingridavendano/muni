@@ -6,10 +6,13 @@
 
     <script type="text/javascript">
         function success(position) {
-            latitutde = position.coords.latitude;
+            latitude = position.coords.latitude;
             longitude = position.coords.longitude;
 
-            console.log(latitutde);
+            $.ajax({
+                url: "getTimes.json?lat=" + latitude + "&lon=" + longitude
+            })
+            console.log(latitude);
             console.log(longitude);
         }
 
