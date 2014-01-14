@@ -30,6 +30,9 @@ db_session = scoped_session(sessionmaker(
 Base = declarative_base()
 Base.query = db_session.query_property()
 
+# -----------------------------------------------------------------------------
+# Connection function that is useful to seed.py to populate database.
+# -----------------------------------------------------------------------------
 
 def connect():
     """ Use this function to connect to database for seed.py file. """
@@ -43,7 +46,7 @@ def connect():
         autoflush=False
         ))
     Base = declarative_base()
-    Base.query = db_session.query_property()
+    Base.query = Session.query_property()
 
     # if recreating the db, then uncomment below
     Base.metadata.create_all(ENGINE)
@@ -79,7 +82,6 @@ def get_stop(code):
     return stop
 
 
-
 def geo_fencing_for_nearest_stops(latitude, longitude):
     """ Finds closest MUNI stop in database by a user's geolocation. """
     equation = "".join(["( 3959 * acos( cos( radians(",
@@ -99,10 +101,7 @@ def geo_fencing_for_nearest_stops(latitude, longitude):
         " LIMIT 0 , 4"
     ])
 
-
-    
     stops = db_session.query(Stop).from_statement(search).all()
 
     deserialize.departures_by_stop(stops[0].code)
-
     return stops
