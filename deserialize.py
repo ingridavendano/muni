@@ -109,7 +109,7 @@ def muni_stops(route_id, direction, stops):
     """ Get XML of SF-MUNI list of stops for each route. """
     for stop in get_stops(route_id, direction):
         stop_id = stop.get("StopCode")
-        
+
         # store each stop in dictionary
         stops[stop_id] = muni_stop(stop.get("name"))
 

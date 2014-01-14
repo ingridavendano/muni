@@ -20,17 +20,19 @@ config_file = open("./config.json")
 config_data = json.load(config_file) 
 config_file.close()
 
-GOOGLE_MAPS_TOKEN = config_data["GOOGLE_API_KEY"]
+GOOGLE_MAPS_TOKEN = config_data["GOOGLE_MAPS"]
 
 # -----------------------------------------------------------------------------
 
 @app.route("/", methods=["GET"])
 def index():
+    # return render_template("master.html", token=GOOGLE_MAPS_TOKEN)
     if session.get("location") and session.get("code"):
         return render_template("index.html", 
             display=True, 
             stop=session["code"], 
-            location=session["location"]
+            location=session["location"],
+            token=GOOGLE_MAPS_TOKEN
             )
     else: 
         return render_template("index.html", display=False, stop="", location="")
@@ -47,15 +49,9 @@ def geo():
     longitude = request.args.get('lng')
 
     session["location"] = (latitude, longitude)
-    stops = model.geo_fencing_for_nearest_stops(latitude, longitude)
-    # print "*"*80
-    # print stops[0].address
-    # print "*"*80
-    session["code"] = stops[0].code
+    json_departures = model.geo_fence(latitude, longitude)
 
-    data = "".join(['{"code":',stops[0].code,'}'])
-
-    return data
+    return json_departures
 
 # -----------------------------------------------------------------------------
 

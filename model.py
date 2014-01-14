@@ -82,7 +82,12 @@ def get_stop(code):
     return stop
 
 
-def geo_fencing_for_nearest_stops(latitude, longitude):
+def get_distance(stop, latitude, longitude):
+    """ Return the distance of a stop from a users current geolocation. """
+    pass
+
+
+def geo_fence(latitude, longitude):
     """ Finds closest MUNI stop in database by a user's geolocation. """
     equation = "".join(["( 3959 * acos( cos( radians(",
         latitude,
