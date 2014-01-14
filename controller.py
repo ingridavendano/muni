@@ -48,9 +48,9 @@ def geo():
 
     session["location"] = (latitude, longitude)
     stops = model.geo_fencing_for_nearest_stops(latitude, longitude)
-    print "*"*80
-    print stops[0].address
-    print "*"*80
+    # print "*"*80
+    # print stops[0].address
+    # print "*"*80
     session["code"] = stops[0].code
 
     data = "".join(['{"code":',stops[0].code,'}'])

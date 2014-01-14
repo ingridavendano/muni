@@ -6,33 +6,48 @@
 # -----------------------------------------------------------------------------
 
 import json
+import deserialize
 
 class DepartureEncoder(json.JSONEncoder):
     """ Encode XML departure times to JSON. """
 
-    def default(self, rtt, name):
+    def default(self, routes):
 
-        def stop_data(stop):
+        def departure(route):
             return {
-                'route': stop.get("Name"),
-                'direction': stop[0][0].get('Name'), 
-                'times': [time.text for time in stop[0][0][0][0][0]]
+                'route': route.get("Name"),
+                'direction': route[0][0].get("Name"),
+                'times': [time.text for time in route[0][0][0][0][0]]
             }
 
         return {
-            'stop': [stop_data(stop) for stop in rtt[0][0][0]]
+            'name': deserialize.muni_stop(routes[0][0][0][0][0].get("name")),
+            'code': routes[0][0][0][0][0].get("StopCode"),
+            'departures': [
+                departure(route) for route in routes
+            ]
         }
 
 # -----------------------------------------------------------------------------
 
-def to_json(name, rtt, debug=False):
+def to_json(stop_id, debug=False):
     """ Converts data about a MUNI stop into JSON. """
 
-    # if no XML stop exists 
-    if name is None: return None
+    # if no departure data was given
+    if stop_id is None: return None
 
-    # encode XML  
-    json_string = json.dumps(rtt, cls=DepartureEncoder)
+    # get XML of departures leaving from stop 
+    departures_at_stop = deserialize.get_departures(stop_id)
 
+    # encode departure for MUNI stop data to JSON
+    json_string = json.dumps(departures_at_stop,
+        cls=DepartureEncoder,
+        # sort_keys=True,
+        # indent=4,
+        # separators=(',', ': ')
+        )
+
+    # for pretty printing uncomment other attributes in json.dumps() above
     if debug: print json_string
+
     return json_string

@@ -50,55 +50,68 @@ def get_xml(url):
     """ Parse XML of real time transit (RTT) data from http://511.org/. """
     response = requests.get(url)
     xml = StringIO(response.text)
-    rtt = ET.parse(xml).getroot()
-    return rtt
+    return ET.parse(xml).getroot()
 
 
-def departures_by_stop(code):
+def get_departures(stop_id):
     """ Gets XML of a list of departure times based on a stop's code. """
-    rtt = get_xml(website + service[6] + token + "&stopcode=" + code)
-    routes = rtt[0][0][0]
-
-    for route in routes:
-        print "#"*80
-        print route.get("Name")
-        print route[0][0].get("Name")
-        times = [time.text for time in route[0][0][0][0][0]]
-        print times
+    rtt = get_xml(website + service[6] + token + "&stopcode=" + stop_id)
+    return rtt[0][0][0]
 
 
 def get_stops(route_id, direction):
     """ Get XML of list of stops for each route. """
     route = "&routeIDF=" + agency[5] + "~" + route_id + direction
     rtt = get_xml(website + service[3] + token + route)
-    stops = rtt[0][0][0][0][0][0][0]
-    return stops
+    return rtt[0][0][0][0][0][0][0]
 
 
 def get_routes(agency):
     """ Get XML of routes from a specific agency. """ 
     rtt = get_xml(website + service[2] + token + "&agencyName=" + agency)
-    routes = rtt[0][0][0]
-    return routes
+    return rtt[0][0][0]
 
 # -----------------------------------------------------------------------------
 # SF-MUNI specific functions below.
 # -----------------------------------------------------------------------------
 
+def muni_times(route):
+    """ Gets XML of departure times at SF-MUNI stop for specific route. """
+    times = [time.text for time in route[0][0][0][0][0]]
+    return times
+
+
+def muni_departures(stop_id):
+    """ Gets XML of routes that departure at specific SF-MUNI stops. """
+    routes = {}
+
+    for route in get_departures(stop_id):
+        name = route.get("Name")
+        direction = route[0][0].get("Name")
+        times = muni_times(route)
+
+        # store the route info at MUNI stop 
+        routes[name] = (direction, times)
+
+    return routes
+
+
+def muni_stop(name):
+    """ Normalize SF-MUNI stop name with regex. """
+    name = re.sub("  and  ", " & ", name)
+    name = re.sub("Street", "St", name)
+    name = re.sub(" Of ", " of ", name)
+    name = re.sub("C Chavez", "Cesar Chavez", name)
+    return name
+
+
 def muni_stops(route_id, direction, stops):
     """ Get XML of SF-MUNI list of stops for each route. """
     for stop in get_stops(route_id, direction):
         stop_id = stop.get("StopCode")
-
-        # cleaning up the data of the names for each stop
-        name = stop.get("name")
-        name = re.sub("  and  ", " & ", name)
-        name = re.sub("Street", "St", name)
-        name = re.sub(" Of ", " of ", name)
-        name = re.sub("C Chavez", "Cesar Chavez", name)
-
+        
         # store each stop in dictionary
-        stops[stop_id] = name
+        stops[stop_id] = muni_stop(stop.get("name"))
 
     return stops
 
@@ -121,4 +134,3 @@ def muni_routes(agency, stops):
 def muni():
     """ Get SF-MUNI data on stops for all of the routes. """
     return muni_routes(agency[5], {})
-

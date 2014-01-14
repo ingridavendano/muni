@@ -9,8 +9,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, Float, String
 from sqlalchemy.orm import sessionmaker, scoped_session
+import serialize
 import deserialize
-
 # -----------------------------------------------------------------------------
 # To create a new database, first follow the steps below in the console:
 #
@@ -101,7 +101,10 @@ def geo_fencing_for_nearest_stops(latitude, longitude):
         " LIMIT 0 , 4"
     ])
 
+    # grab all stops 
     stops = db_session.query(Stop).from_statement(search).all()
 
-    deserialize.departures_by_stop(stops[0].code)
-    return stops
+    # return results for just one stop
+    json_string = serialize.to_json(stops[0].code, debug=True)
+
+    return json_string
