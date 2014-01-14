@@ -1,56 +1,24 @@
 {% extends 'master.html' %}
 {% block body %}
-    <p>
-        hello
-    </p>
 
-    {% if display is defined %}
-        <!-- <p>test</p> -->
-        <!-- <p>{{ stop }}</p> -->
-        <!-- {% for stop in stops %}
-            <li>stop.address</li>
-        {% endfor %} -->
-        <span id="dt">test</span>
-    {% endif %}
+{% if display is defined %}
+  <h2><span id="departure-stop"></span></h2>
+    <div class="panel panel-info">
+      <div class="panel-heading"><span id="departure-route"></span></div>
+      <table class="table" id="times"></table>
+    </div>
+{% endif %}
 
+<!-- <div class="row">
+        <div class="col-md-6">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <h3>Upcoming Departure Times</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6"></div>
+      </div> -->
 
-    <script type="text/javascript">
-        function success(position) {
-            latitude = position.coords.latitude;
-            longitude = position.coords.longitude;
-
-            $.getJSON(
-                "getTimes.json",
-                {lat: latitude, lng: longitude}, 
-                function(json) {
-                    console.log(json.code);
-                } 
-            )
-            // $.ajax({
-            //     url: "getTimes.json?lat=" + latitude + "&lng=" + longitude
-            // })
-            console.log(latitude);
-            console.log(longitude);
-        }
-
-        function error(msg) {
-            console.log(msg)
-        }
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(success, error);
-        } else {
-            error("NOT WORKING!");
-        }
-    </script>
-
-    <script type="text/javascript">
-        {% if display is defined %}
-            var dt = document.querySelector("#dt");
-            dt.innerHTML = {{ stop }}
-        {% endif %}
-
-
-    </script>
-
+<script type="text/javascript" src="./static/js/departures.js"></script>
 {% endblock %}
