@@ -53,6 +53,11 @@ def geo():
 
     return json_departures
 
+@app.route("/lat/<latitude>/lng/<longitude>/rad/<radius>/stops")
+def nearest_muni_departures(latitude, longitude, radius): 
+    json_departures = model.geo_fence(latitude, longitude, radius)
+    return json_departures
+
 # -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
