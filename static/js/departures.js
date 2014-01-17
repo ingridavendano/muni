@@ -78,13 +78,12 @@ var StopListView = Backbone.View.extend({
             //inside this function gets called every time an item is added to the colleciton
             var view = new StopView({'model':model}); //create item view
             this.render(view) //add item view to main view
-            
         });
     },
     render: function(view) {
         view.$el.appendTo(this.$el); //append to the list the new view $el
     }
-})
+});
 
 var StopView = Backbone.View.extend({
     initialize: function() {
@@ -92,7 +91,22 @@ var StopView = Backbone.View.extend({
         this.listenTo(this.model, 'change:name', this.renderName) // this renders on change
     },
     render: function() {
-        this.$el.html(this.model.get('name'))
+        this.$el.html(this.model.get('departures')[0].times[0]);
+        return this;
+    },
+    renderName: function() {
+        var that = this;
+        this.$el.fadeOut(1000, function(){that.render()})
+    }
+});
+
+var DeparturesView = Backbone.View.extend({
+    initialize: function() {
+        this.render(); // this renders when created
+        this.listenTo(this.model, 'name', this.renderName) // this renders on change
+    },
+    render: function() {
+        this.$el.html(this.model.get('departures')[0].times[0]);
         return this;
     },
     renderName: function() {
@@ -101,12 +115,15 @@ var StopView = Backbone.View.extend({
     }
 })
 
+
+
+
 /* ------------------------------------------------------------------------- */
 
 function success(position) {
     var latitude = position.coords.latitude;
     var longitude = position.coords.longitude;
-    var radius = 1;
+    var radius = 15;
 
     coords = new Coords({lat:latitude, lng:longitude, rad:radius});
     stopsList = new StopListView({el:'#times', collection:coords.stops});

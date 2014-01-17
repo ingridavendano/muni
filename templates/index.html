@@ -1,23 +1,33 @@
 {% extends 'master.html' %}
 {% block body %}
 
+<h1 class="title">WHEN IS THE NEXT MUNI LEAVING?</h1>
+<div class="stop-name">Church &amp; 27th</div>
+  
+<div class="times">
+  <div class="outbound-times">
+    <div class="direction">outbound</div>
+    <div class="time-1">5</div>
+    <div class="minutes">minutes</div>
+    <div class="time-2">10</div>
+    <div class="time-3">13</div>
+  </div>
+  <div class="inbound-times">
+    <div class="direction">inbound</div>
+    <div class="time-1">3</div>
+    <div class="minutes">minutes</div>
+    <div class="time-2">18</div>
+    <div class="time-3">24</div>
+  </div>
+</div>
 {% if display is defined %}
-    <div class="panel panel-info">
-      <div class="panel-heading"><span id="departure-stop"></span></div>
-      <ul id="times"></ul>
-    </div>
-{% endif %}
+    <!-- <div class="panel panel-info">
+      <div class="panel-heading"><span id="departure-stop">Church and 27th</span></div>
+      <ul id="times">
+      </ul>
+    </div> -->
 
-<!-- <div class="row">
-        <div class="col-md-6">
-          <div class="panel panel-default">
-            <div class="panel-body">
-              <h3>Upcoming Departure Times</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6"></div>
-      </div> -->
+{% endif %}
 
 <script type="text/javascript" src="./static/js/departures.js"></script>
 {% endblock %}
