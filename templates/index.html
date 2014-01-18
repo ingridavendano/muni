@@ -1,52 +1,13 @@
 {% extends 'master.html' %}
 {% block body %}
+
+<div id="target"></div>
 <div class="muni-data"> 
 
-  <div class="departure-main">
-    <div class="route">
-      <div class="stop-name">Church &amp; 27th</div>
-     <!--  <div class="stop-change-direction">
-        <span class="glyphicon glyphicon-sort"></span>
-      </div>
-      <div class="stop-route-direction">Inbound to Downtown</div> -->
-    </div>
-      
-    <div class="route-departure-time">
-      <div class="current-route">
+  <div id="closest-stop"></div>
 
-        <div class="time">
-          <div class="time-amount">18</div>
-          <div class="time-minutes">minutes</div>
-        </div>
-
-        <div class="current-route-direction">inbound to downtown</div>
-
-        <div class="other-route-0">
-          <div class="route-name">J-Church</div>
-          <div class="change-direction">
-            <span class="glyphicon glyphicon-sort"></span>
-          </div>
-        </div>
-      </div>
-        
-      <!-- <div class="other-route-1">
-        <div class="other-route-name">2-Clement</div>
-        <div class="other-route-time">
-          <div class="other-time-amount">13 </div>
-          <div class="other-time-minutes">mins</div>
-        </div>
-      </div>
-
-      <div class="other-route-2">
-        <div class="other-route-name">3-Jackson</div>
-        <div class="other-route-time">
-          <div class="other-time-amount">9 </div>
-          <div class="other-time-minutes">mins</div>
-        </div>
-      </div> -->
-    </div>
-  </div>
-
+  <div id="next-closest-stops"></div>
+<!-- 
   <div class="departure-sub-1">
     <div class="route">
       <div class="sub-stop-name">Church &amp; 29th (0.1 m)</div>
@@ -57,18 +18,75 @@
     <div class="route">
       <div class="sub-stop-name">Church &amp; 24th (0.3 m)</div>
     </div>
-  </div>
+  </div> -->
   
 </div>
 <div id="map-canvas"/>
-<div>
 
-<
-  
-</div>
+<script type="text/html" id='closest-stop-tmpl'>
+  <div class="departure-main">
+    <div class="route">
+      <div class="stop-name"><%= stop.name %></div>
+    </div>
+    <div class="route-departure-time">
+      <div class="current-route">
+        <div class="time">
+          <% if (stop.routes[0].transit[0].times[0] == 'N/A') { %>
+            <div class="time-amount" style="font-size: 180px; padding-bottom: 10px;">no</div>
+            <div class="time-minutes">muni</div>
+          <% } else { %>
+            <div class="time-amount"><%= stop.routes[0].transit[0].times[0] %></div>
+            <% if (stop.routes[0].transit[0].times[0] == '1') { %> 
+              <div class="time-minutes">minute</div>
+            <% } else { %>
+              <div class="time-minutes">minutes</div>
+            <% } %>
+          <% } %>
+        </div>
+        <div class="current-route-direction"><%= stop.routes[0].transit[0].course %></div>
+        <div class="other-route-0">
+          <div class="route-name"><%= stop.routes[0].line %></div>
+          <div class="change-direction">
+            <span class="glyphicon glyphicon-sort"></span>
+          </div>
+        </div>
+      </div>
+      <div class="other-routes-at-stop"></div>
+    </div>
+  </div>
+</script>
 
-<!-- <div id="map-canvas"/> -->
+<script type="text/html" id='next-closest-stop-tmpl'>
+  <div class="departure-sub-<%= stop.index %>">
+    <div class="route">
+      <div class="sub-stop-name"><%= stop.name %> (<%= stop.distance %> mi)</div>
+    </div>
+  </div> 
+</script>
 
+
+<script type="text/html" id='next-closest-stop-tmpl-2'>
+    // <div class="other-route-1">
+    //   <div class="other-route-name">2-Clement</div>
+    //   <div class="other-route-time">
+    //     <div class="other-time-amount">13 </div>
+    //     <div class="other-time-minutes">mins</div>
+    //   </div>
+    // </div>
+
+    // <div class="other-route-2">
+    //   <div class="other-route-name">3-Jackson</div>
+    //   <div class="other-route-time">
+    //     <div class="other-time-amount">9 </div>
+    //     <div class="other-time-minutes">mins</div>
+    //   </div>
+    // </div>
+</script>
+
+
+
+
+<script type="text/javascript" src="./static/js/departures.js"></script>
 <script type="text/javascript">
   function initialize() {
     var mapOptions = {
@@ -81,5 +99,7 @@
   google.maps.event.addDomListener(window, 'load', initialize);
 </script>
 
-<script type="text/javascript" src="./static/js/departures.js"></script>
+
+
+
 {% endblock %}

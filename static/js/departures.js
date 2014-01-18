@@ -7,45 +7,23 @@
 
 var user, stops, coords;
 
+var latitude, longitude;
+
 /* ------------------------------------------------------------------------- 
  * Backbone for models: User, Departure, Stop, Coords and collection: Stops. 
  * ------------------------------------------------------------------------- */
 
-// var User = Backbone.Model.extend({
-//     defaults: function() {
-//         return {
-//             lat: 0,
-//             lng: 0,
-//             radius: 1
-//         }
-//     }
-// });
-
-var Departure = Backbone.Model.extend({
-    defaults: function() {
-        return {
-            direction: '', 
-            route: '', 
-            times: []
-        }
-    }
-});
-
-var Stop = Backbone.Model.extend({
-    defaults: function() {
-        return {
-            dist: 0, 
-            lat: 0, 
-            lng: 0, 
-            name: '', 
-            departures: []
-        }
-    }
-});
+// var Departure = Backbone.Model.extend();
+var Stop = Backbone.Model.extend();
 
 var Stops = Backbone.Collection.extend({
     initialize: function(args) {
         this.baseUrl = args.coords_url + '/stops';
+    },
+    defaults: function() {
+        return {
+            test: "ingrid"
+        }
     },
     url: function() {
         return this.baseUrl;
@@ -75,9 +53,53 @@ var Coords = Backbone.Model.extend({
 var StopListView = Backbone.View.extend({
     initialize: function() {
         this.listenTo(this.collection, 'add', function(model,collection,opts) {
+            var view = new StopView({'model':model}); 
+            this.render(view) 
+        });
+    },
+    render: function(view) {
+        // append to the list the new view $el
+        view.$el.appendTo(this.$el); 
+    }
+});
+
+var FirstStopView = Backbone.View.extend({
+    template: _.template($('#closest-stop-tmpl').html()),
+    initialize: function() {
+        this.listenTo(this.model, 'change', function(model, opts) {
+            this.render();
+        });
+        this.render();
+    },
+    render: function() {
+        this.$el.html(this.template({stop: this.model.attributes}));
+        return this;
+    },
+});
+
+var StopView = Backbone.View.extend({
+    initialize: function (){
+        this.render();
+    },
+    template: _.template($('#next-closest-stop-tmpl').html()),
+    render: function() {
+        this.$el.html(this.template({stop: this.model.attributes}));
+        return this;
+    }
+});
+
+var NextStopViews = Backbone.View.extend({
+    initialize: function() {
+        this.listenTo(this.collection, 'add', function(model,collection,opts) {
             //inside this function gets called every time an item is added to the colleciton
-            var view = new StopView({'model':model}); //create item view
-            this.render(view) //add item view to main view
+            
+            if (this.collection.models[0] != model) {
+                // provide index to change color view of stop
+                model.attributes.index = collection.models.indexOf(model);
+
+                var view = new StopView({'model':model}); //create item view
+                this.render(view) //add item view to main view
+            }
         });
     },
     render: function(view) {
@@ -85,58 +107,41 @@ var StopListView = Backbone.View.extend({
     }
 });
 
-var StopView = Backbone.View.extend({
-    initialize: function() {
-        this.render(); // this renders when created
-        this.listenTo(this.model, 'change:name', this.renderName) // this renders on change
-    },
-    render: function() {
-        this.$el.html(this.model.get('departures')[0].times[0]);
-        return this;
-    },
-    renderName: function() {
-        var that = this;
-        this.$el.fadeOut(1000, function(){that.render()})
+function linkRoutes(models) {
+    console.log('models');
+    for (var i = 0; i < models.length; i++) {
+        console.log(models.at(i).attributes);
     }
-});
-
-var DeparturesView = Backbone.View.extend({
-    initialize: function() {
-        this.render(); // this renders when created
-        this.listenTo(this.model, 'name', this.renderName) // this renders on change
-    },
-    render: function() {
-        this.$el.html(this.model.get('departures')[0].times[0]);
-        return this;
-    },
-    renderName: function() {
-        var that = this;
-        this.$el.fadeOut(1000, function(){that.render()})
-    }
-})
 
 
+}
 
 
 /* ------------------------------------------------------------------------- */
 
 function success(position) {
-    var latitude = position.coords.latitude;
-    var longitude = position.coords.longitude;
+    latitude = position.coords.latitude;
+    longitude = position.coords.longitude;
     var radius = 15;
 
     coords = new Coords({lat:latitude, lng:longitude, rad:radius});
-    stopsList = new StopListView({el:'#times', collection:coords.stops});
-    coords.stops.fetch();
+    // stopsList = new NearestStopView({el:'#closest-stop', collection:coords.stops.models});
+    // test = new LibraryView({el:'#target', collection: coords.stops});
+    // coords.stops.fetch();
 
-    window.setInterval(function() {
-        coords.stops.fetch();
-    },1000*60); // update every 60 seconds
+    nextStopViews = new NextStopViews({el:'#next-closest-stops', collection:coords.stops});
 
-
-    console.log(stops);
-    console.log(latitude);
-    console.log(longitude);
+    // linkRoutes(coords.stops); 
+    coords.stops.fetch({success:function() {
+        //stuff that happens when a fetch is successful
+        linkRoutes(coords.stops); 
+        firstStopView = new FirstStopView({el:'#closest-stop', model:coords.stops.at(0)});
+        
+    
+    }});
+    // nextStopViews = new NextStopViews({el:'#next-closest-stops', collection:coords.stops.models}); 
+    // nextStopViews = new NextStopViews({el:'#next-closest-stops', collection:coords.stops.models}); 
+    
 }
 
 function error(msg) {
