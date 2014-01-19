@@ -139,7 +139,24 @@ function success(position) {
     }});
     // nextStopViews = new NextStopViews({el:'#next-closest-stops', collection:coords.stops.models}); 
     // nextStopViews = new NextStopViews({el:'#next-closest-stops', collection:coords.stops.models}); 
-    
+    var user_position = new google.maps.LatLng(latitude, longitude);
+  
+    var mapOptions = {
+        center: new google.maps.LatLng(latitude+0.002, longitude+0.006),
+        zoom: 15,
+        navigationControl: true,
+        mapTypeControl: false,
+        scaleControl: true,
+        draggable: false, 
+    };
+
+    var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+    var marker = new google.maps.Marker({
+        position: user_position,
+        map: map,
+        title:"You are here!"
+    });
 }
 
 function error(msg) {

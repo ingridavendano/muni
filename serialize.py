@@ -87,6 +87,12 @@ def remove_lat_lng(routes):
     return (routes, lat, lng)
 
 
+def organize_route_name(name):
+    """ Provide proper dash in how name is represented. """
+    name = name.split('-')
+    return name[0] + ' - ' + name[1]
+
+
 def sort_stops(stops):
     """ Get routes for bus stops to show up in ascending order. """ 
     tmp_stops = []
@@ -98,8 +104,11 @@ def sort_stops(stops):
         tmp_stops.append({
             'name': name,  
             'routes': [
-                {'line': n[0], 'code': n[1], 'departures': sort_routes(d)} 
-                    for n, d in routes.iteritems()
+                {
+                'line': organize_route_name(name[0]), 
+                'code': name[1], 
+                'departures': sort_routes(departures)} 
+                    for name, departures in routes.iteritems()
                 ], 
             'distance': distance
             })

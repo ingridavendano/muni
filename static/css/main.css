@@ -8,6 +8,7 @@ h1 {
 .departure-main {
     background-color: #0A7B83;
     z-index: 10;
+    width: 100%;
 }
 
 .muni-data {
@@ -15,18 +16,90 @@ h1 {
     position: relative;
     color: white;
 }
+
+.logo {
+    padding: 40px 0;
+}
+
+
+.app-title {
+    display: inline;
+}
+
+.app-location {
+    display: inline;
+    color: #bac1c8;
+    float: right;
+}
+
 /* ------------------------------------------------------------------------- */
 
+.closest-stop {
+    height: 78px;
+}
+
 .route {
-    display: inline-block;
-    text-align: left;
-    width: 60%;
-    margin: 10px 20px;
+    padding: 5px 20px;
 }
 
 .stop-name {
     font-size: 34px;
-    margin-bottom: -5px
+    margin-bottom: -5px;
+    display: inline;
+}
+
+.stop-dist {
+    display: inline;
+    float: right;
+}
+.pagination {
+    display: inline; 
+    padding: 0 40px
+
+}
+
+.pagination > ul {
+    background-color: #0A7B83;
+}
+
+.pagination ul li {
+    vertical-align: text-bottom;
+}
+
+.pagination ul li.active > a {
+    background-color: white;
+    border-color: white;
+    border-width: 7px !important;
+    color: #0A7B83;
+    margin: 10px 35px 0 0;
+    text-align: center;
+    opacity: 0.5;
+    font-size: 20px;
+    padding: 0 10px;
+    border-radius: 4px;
+}
+
+.route-mins {
+    display: none;
+}
+
+.pagination ul li.active:hover > a .route-mins {
+    display: inline;
+    font-size: 16px;
+}
+
+.pagination ul li.active:hover > a .route-code {
+    display: none;
+}
+
+.pagination ul li.active:hover > a {
+    color: #0A7B83;
+    opacity: 1;
+}
+
+.pagination ul li.next:hover > a {
+    background-color: #0A7B83;
+    font-size: 20px;
 }
 
 .stop-change-direction {
@@ -44,6 +117,7 @@ h1 {
     -o-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
     transform: rotate(90deg);
+    vertical-align: text-top;
 }
 
 .stop-route-direction {
@@ -58,27 +132,37 @@ h1 {
     display: inline-block;
     text-align: center;
     float: right;
-    width: 300px;
+    width: 320px;
+    z-index: 5;
 }
 
 .time {
-    margin-top: 20px;
     margin-bottom: -32px;
 }
 
 .time-amount {
     font-size: 200px;
-    margin-bottom: -110px;
+    margin-bottom: -200px;
+    position: relative;
+    top: -90px;
 }
 
 .time-minutes {
     font-size: 55px;
     margin-bottom: 20px;
+
+}
+
+.route-departure-info {
+    padding-top: 30px;
+    font-size: 30px;
+    margin-bottom: -15px;
+    opacity: 0.7;
 }
 
 .current-route-direction {
     font-size: 22px;
-    margin-bottom: 40px
+    opacity: 0.7;
 }
 
 .other-route-0 {
@@ -129,17 +213,13 @@ h1 {
     display:none;
 }
 
-/*.route-name:hover:before .route-name-full  {
-    display: none; 
-}
-*/
 .route-name:hover .route-name-abbr {
     display: none;
-    transition: opacity 0.5s linear;
 }
+
 .route-name:hover .route-name-dir {
     display: inline;
-    transition: opacity 0.5s linear;
+    transition: opacity 1s linear;
 }
 
 .change-direction {
@@ -183,16 +263,26 @@ h1 {
     background-color: #F19C65;
 }
 
-.sub-stop-name {
-    font-size: 25px;
+.sub-route {
+    font-size: 20px;
     opacity: 0.5;
+    display: inline-block;
+    text-align: left;
+    margin: 8px 20px;
 }
 
-.sub-stop-name:hover {
-    font-size: 25px;
+.sub-route:hover {
     opacity: 1;
     transition: opacity 0.5s linear;
 }
+
+.sub-stop-name {
+}
+
+.sub-stop-dist {
+    margin-left: 10px;
+}
+
 
 
 .container, h1 {
@@ -200,8 +290,8 @@ h1 {
 }
 
 #map-canvas {
-    margin-top: 200px;
-    height: 500px;
+    margin-top: 230px;
+    height: 480px;
     width: 100%;
     position: absolute; 
     z-index: 0;
@@ -212,7 +302,16 @@ h1 {
 }
 
 footer {
-    text-align: center;
+    text-align: left;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 10;
+    font-size: 18px;
+    padding-top: 10px;
+    padding-left: 20px;
+    margin-top: 30px;
 }
 
 

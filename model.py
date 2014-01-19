@@ -84,8 +84,8 @@ def get_stop(code):
 
 
 def geo_fence(latitude, longitude, radius, limit=4):
-    latitude = str(37.78651)
-    longitude = str(-122.40157)
+    # latitude = str(37.78651)
+    # longitude = str(-122.40157)
     """ Finds closest MUNI stop in database by a user's geolocation. """
     equation = "".join(["( 3959 * acos( cos( radians(",
         latitude,
