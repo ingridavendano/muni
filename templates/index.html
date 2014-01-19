@@ -22,6 +22,7 @@
   
 </div>
 <div id="map-canvas"/>
+<span class="fui-heart"></span>
 
 <script type="text/html" id='closest-stop-tmpl'>
   <div class="departure-main">
@@ -30,22 +31,38 @@
     </div>
     <div class="route-departure-time">
       <div class="current-route">
+        <div class="route-departure-info">
+          <div class="route-departure-name"><%= stop.routes[0].line %></div>
+          <div class="route-departure-dir"><%= stop.routes[0].departures[0].direction %></div>
+        </div>
         <div class="time">
-          <% if (stop.routes[0].transit[0].times[0] == 'N/A') { %>
+          <% if (stop.routes[0].departures[0].times[0] == 'N/A') { %>
             <div class="time-amount" style="font-size: 180px; padding-bottom: 10px;">no</div>
             <div class="time-minutes">muni</div>
           <% } else { %>
-            <div class="time-amount"><%= stop.routes[0].transit[0].times[0] %></div>
-            <% if (stop.routes[0].transit[0].times[0] == '1') { %> 
+            <div class="time-amount"><%= stop.routes[0].departures[0].times[0] %></div>
+            <% if (stop.routes[0].departures[0].times[0] == '1') { %> 
               <div class="time-minutes">minute</div>
             <% } else { %>
               <div class="time-minutes">minutes</div>
             <% } %>
           <% } %>
         </div>
-        <div class="current-route-direction"><%= stop.routes[0].transit[0].course %></div>
+        <div class="current-route-direction"><%= stop.routes[0].departures[0].destination %></div>
         <div class="other-route-0">
-          <div class="route-name"><%= stop.routes[0].line %></div>
+          <div class="route-direction">
+            <% if (stop.routes[0].departures[0].direction == "outbound") { %>
+              <span class="fui-arrow-right inbound"></span>
+              <span class="fui-arrow-right outbound dim-direction"></span>
+            <% } else { %>
+              <span class="fui-arrow-right inbound dim-direction"></span>
+              <span class="fui-arrow-right outbound"></span>
+            <% } %>
+          </div>
+          <div class="route-name">
+            <span class="route-name-abbr"><%= stop.routes[0].code %></span>
+            <span class="route-name-dir"><%= stop.routes[0].departures[0].direction %></span>
+          </div>
           <div class="change-direction">
             <span class="glyphicon glyphicon-sort"></span>
           </div>
@@ -73,16 +90,15 @@
     //     <div class="other-time-minutes">mins</div>
     //   </div>
     // </div>
+</script>
 
-    // <div class="other-route-2">
+<!--     // <div class="other-route-2">
     //   <div class="other-route-name">3-Jackson</div>
     //   <div class="other-route-time">
     //     <div class="other-time-amount">9 </div>
     //     <div class="other-time-minutes">mins</div>
     //   </div>
-    // </div>
-</script>
-
+    // </div> -->
 
 
 

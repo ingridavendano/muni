@@ -91,19 +91,17 @@ var StopView = Backbone.View.extend({
 var NextStopViews = Backbone.View.extend({
     initialize: function() {
         this.listenTo(this.collection, 'add', function(model,collection,opts) {
-            //inside this function gets called every time an item is added to the colleciton
             
             if (this.collection.models[0] != model) {
-                // provide index to change color view of stop
-                model.attributes.index = collection.models.indexOf(model);
+                 model.attributes.index = collection.models.indexOf(model);
 
-                var view = new StopView({'model':model}); //create item view
-                this.render(view) //add item view to main view
+                var view = new StopView({'model':model}); 
+                this.render(view) 
             }
         });
     },
     render: function(view) {
-        view.$el.appendTo(this.$el); //append to the list the new view $el
+        view.$el.appendTo(this.$el);
     }
 });
 
