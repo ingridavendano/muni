@@ -9,13 +9,13 @@ This is a web application that provides public transportation departures for MUN
 Development
 -----------
 
-The backend of this project used Python/Flask and MySQL. The 511 API provided XML of the departure times for each MUNI stop, however no geolocations were mapped to the stops. A database was created using the `seed.py` file to populate the latitude and longitude for each MUNI stop. 
+The backend of this project used Python/Flask and MySQL. The 511 API provided XMLs of the departure times for each MUNI stop, however no geolocations were mapped to the stops. A database was created using the `seed.py` file to populate the latitude and longitude for each MUNI stop. 
 
-XML data is read into the app through the 'serialize.py' file and mapped to the database for results. The nearby MUNI stops are determined using the Haversine formula to do geofencing. Found data about nearby stops are converted to JSON in the 'serialize.py' file. Most of the data is manually manipulated into JSON instead of using JSONEncoder class. The Python json module did not provide enough functionality in the way needed to rearrange the data. Data was rearranged by priority by distance from user and nearest time.
+XML data is read into the app through the deserialize.py file and mapped to the database for results. The nearby MUNI stops are determined using the Haversine formula to do geofencing. Found data about nearby stops are converted to JSON in the serialize.py file. The json module for Python did not provide enough functionality in the way needed to rearrange the data, so data was manually manipulated into JSON instead of using a JSONEncoder. Data was rearranged by priority by distance from user and nearest time.
 
 For the frontend [Backbone](http://backbonejs.org/) framework was used to setup Models for each MUNI stop. While [Underscore](http://underscorejs.org/) was used to create the main template to navigate between different stops. 
 
-Stylistic Choices
+Stylistic choices
 -----------------
 
 The departure time for a MUNI was in a large font at on the bottom of the route of the inbound or outbound MUNI has two arrows to indicate the direction on the left. On the right there is the option to see the reserve direction (if there is one) for the specific route being viewed. 
@@ -29,6 +29,17 @@ Up to three different MUNI stops will display given the location of the user. Th
 ![alt text](./static/pics/sf_muni_3.jpg)
 
 The map view is also disabled and won't allow a user to move their geolocation marker. Users have the option to just click between the 1-3 stops provided. 
+
+Things to improve
+-----------------
+
+* Make app work for mobile.
+* Provide a notification to the user that their geolocation is needed. 
+* Provide alternative options to users when MUNI stops are not available or a user lives too far away.
+* Refactor how JSON was encoded from the database to frontend.
+* Allow a user to move the map and drag the pin marker to a new location to find alternative MUNI times. 
+* Provide more departure times (when available) for routes.
+
 
 Extras
 ------
