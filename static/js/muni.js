@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------
- * departure.js
+ * muni.js
  * Created by Ingrid Avendano on 1/15/14. 
  * -------------------------------------------------------------------------
  * Contains Backbone to have model and collections of nearest departures. 

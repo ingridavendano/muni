@@ -1,14 +1,5 @@
-
-
-h1 { 
-    font-size: 80px;
-    margin: 50px 0;
-}
-
-.departure-main {
-    background-color: #0A7B83;
-    z-index: 10;
-    width: 100%;
+.container {
+    padding: 0;
 }
 
 .muni-data {
@@ -17,16 +8,23 @@ h1 {
     color: white;
 }
 
+.muni-stops-data {
+    z-index: 10;
+    width: 100%;
+    position: absolute;
+}
+
 .logo {
     padding: 40px 0;
 }
 
-
-.app-title {
+.logo > .title {
     display: inline;
+    font-size: 80px;
+    margin: 50px 0;
 }
 
-.app-location {
+.logo > .location {
     display: inline;
     color: #bac1c8;
     float: right;
@@ -34,84 +32,204 @@ h1 {
 
 /* ------------------------------------------------------------------------- */
 
-.closest-stop {
-    height: 78px;
+.color-0 {
+    background-color: #0A7B83;
 }
 
-.route {
+.color-1 {
+    background-color: #2AA876;    
+}
+
+.color-2 {
+    background-color: #F19C65;   
+}
+
+.stop-info {
+    width: 100%;
+    z-index: 10;
     padding: 5px 20px;
 }
 
-.stop-name {
+.stop-info > .address {
     font-size: 34px;
     margin-bottom: -5px;
     display: inline;
 }
 
-.stop-dist {
+.stop-info > .distance {
+    font-size: 20px;
     display: inline;
     float: right;
+    opacity: 0.5;
+    padding-top: 4px;
 }
-.pagination {
+
+.stop-info > .pagination {
     display: inline; 
     padding: 0 40px
-
 }
 
-.pagination > ul {
+.stop-info > .pagination > ul.color-0 {
     background-color: #0A7B83;
 }
 
-.pagination ul li {
+.stop-info > .pagination > ul.color-1 {
+    background-color: #2AA876;    
+}
+
+.stop-info > .pagination > ul.color-2 {
+    background-color: #F19C65;   
+}
+
+.stop-info > .pagination ul li {
     vertical-align: text-bottom;
 }
 
-.pagination ul li.active > a {
+.stop-info > .pagination ul li.active > a .index {
+    display: none;
+}
+
+.stop-info > .pagination ul li.inactive > a .index {
+    display: none;
+}
+
+.stop-info > .pagination ul li.active:hover > a .route-code {
+    display: inline;
+}
+
+.stop-info > .pagination ul li.active:hover > a {
+    color: #0A7B83;
+    opacity: 1;
+}
+
+.stop-info > .pagination ul li.next:hover > a {
+    background-color: #0A7B83;
+    font-size: 20px;
+}
+
+.stop-info > .pagination ul li > a {
     background-color: white;
     border-color: white;
     border-width: 7px !important;
     color: #0A7B83;
     margin: 10px 35px 0 0;
     text-align: center;
-    opacity: 0.5;
     font-size: 20px;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 4px;
 }
 
-.route-mins {
-    display: none;
+.stop-info > .pagination ul li.active > a {
+    opacity: 0.5;
 }
 
-.pagination ul li.active:hover > a .route-mins {
-    display: inline;
-    font-size: 16px;
-}
-
-.pagination ul li.active:hover > a .route-code {
-    display: none;
-}
-
-.pagination ul li.active:hover > a {
-    color: #0A7B83;
+.stop-info > .pagination ul li.inactive > a {
     opacity: 1;
 }
 
-.pagination ul li.next:hover > a {
-    background-color: #0A7B83;
-    font-size: 20px;
+.departure-info .color-0 {
+    background-color: #0A7B83;    
 }
 
-.stop-change-direction {
+.departure-info .color-1 {
+    background-color: #2AA876;    
+}
+
+.departure-info .color-2 {
+    background-color: #F19C65;   
+}
+
+.departure-info {
     display: inline-block;
-    float: left;
     text-align: center;
-    margin: 0 10px 0 5px;
-    padding-top: 3px;
-    font-size: 18px;
+    float: right;
+    width: 320px;
+    z-index: 5;
+    padding: 0 10px 8px 10px;
 }
 
-.glyphicon  {
+.departure-info > .time {
+    margin-bottom: -32px;
+}
+
+.departure-info > .time > .amount {
+    font-size: 200px;
+    margin-bottom: -200px;
+    position: relative;
+    top: -90px;
+}
+
+.departure-info > .time > .minutes {
+    font-size: 55px;
+    margin-bottom: 20px;
+}
+
+.departure-info > .route {
+    padding-top: 25px;
+    margin-bottom: 10px;
+}
+.departure-info > .route > .name {
+    font-size: 28px;
+    margin-bottom: -12px;
+    opacity: 0.7;
+}
+
+.departure-info > .route > .destination {
+    font-size: 22px;
+    opacity: 0.7;
+}
+
+.departure-info > .direction {
+    padding: 12px 5px;
+}
+
+.departure-info > .direction > .arrows {
+    display: inline-block;
+    text-align: left;
+    font-size: 28px;
+    float: left;
+}
+
+.departure-info > .direction > .arrows > .dim-direction {
+    opacity: 0.5;
+}
+
+.departure-info > .direction > .arrows > .inbound {
+    display: inline-block;
+    margin-right: -18px;
+}
+
+.departure-info > .direction > .arrows > .outbound {
+    display: inline-block;
+}
+
+.departure-info > .direction > .arrows > .route-name {
+    display: inline-block;
+    font-size: 30px;
+    text-align: left;
+}
+
+.departure-info > .direction > .arrows > .route-name .orientation {
+    display: none;
+}
+
+.departure-info > .direction > .arrows > .route-name:hover .orientation {
+    display: inline;
+}
+
+.departure-info > .direction > .arrows > .route-name:hover .abbrivation {
+    display: none;
+}
+
+.departure-info > .direction > .change {
+    display: inline-block;
+    font-size: 30px;
+    text-align: right;
+    float: right;
+    margin-right: 6px;
+}
+
+.departure-info > .direction > .change > .glyphicon  {
     -webkit-transform: rotate(90deg);
     -moz-transform: rotate(90deg);
     -o-transform: rotate(90deg);
@@ -120,185 +238,81 @@ h1 {
     vertical-align: text-top;
 }
 
-.stop-route-direction {
-    font-size: 20px;
-}
-
 /* ------------------------------------------------------------------------- */
 
-
-.route-departure-time {
+.next-stop .color-0 {
     background-color: #0A7B83;
-    display: inline-block;
-    text-align: center;
-    float: right;
-    width: 320px;
-    z-index: 5;
 }
 
-.time {
-    margin-bottom: -32px;
-}
-
-.time-amount {
-    font-size: 200px;
-    margin-bottom: -200px;
-    position: relative;
-    top: -90px;
-}
-
-.time-minutes {
-    font-size: 55px;
-    margin-bottom: 20px;
-
-}
-
-.route-departure-info {
-    padding-top: 30px;
-    font-size: 30px;
-    margin-bottom: -15px;
-    opacity: 0.7;
-}
-
-.current-route-direction {
-    font-size: 22px;
-    opacity: 0.7;
-}
-
-.other-route-0 {
-    background-color: #0A7B83;
-    padding: 12px 5px;
-}
-
-.other-route-1 {
-    background-color: #0A7BAE;
-    padding: 12px 5px;
-}
-
-.other-route-2 {
-    background-color: #0A7BF5;
-    padding: 12px 5px;
-}
-
-.route-direction {
-    display: inline-block;
-    text-align: left;
-    font-size: 28px;
-}
-
-.dim-direction {
-    opacity: 0.5;
-}
-
-.inbound {
-    display: inline-block;
-    margin-left: -20px;
-    margin-right: -18px;
-}
-
-.outbound {
-    display: inline-block;
-    margin-right: -8px;
-}
-
-.route-name {
-    display: inline-block;
-    font-size: 30px;
-    width: 60%;
-    text-align: left;
-    /*padding-left: 12px;*/
-}
-
-.route-name-dir {
-    display:none;
-}
-
-.route-name:hover .route-name-abbr {
-    display: none;
-}
-
-.route-name:hover .route-name-dir {
-    display: inline;
-    transition: opacity 1s linear;
-}
-
-.change-direction {
-    display: inline-block;
-    width: 10%;
-    font-size: 30px;
-    text-align: right;
-}
-
-.other-route-name {
-    display: inline-block;
-    font-size: 30px;
-    width: 80%;
-    text-align: left;
-    vertical-align: middle;
-}
-
-.other-route-time {
-    display: inline-block;
-    width: 10%;
-    vertical-align: middle;
-}
-
-.other-time-amount {
-    font-size: 20px;
-    margin-bottom: -8px;
-}
-
-.other-time-minutes {
-    font-size: 12px;
-}
-
-/* ------------------------------------------------------------------------- */
-
-
-.departure-sub-1 {
+.next-stop .color-1 {
     background-color: #2AA876;
 }
 
-.departure-sub-2 {
+.next-stop .color-2 {
     background-color: #F19C65;
 }
 
-.sub-route {
+.next-stop {
+    width: 100%;
+    height: 60px;
+    margin-top: -8px;
+}
+
+.next-stop-1 {
+    background-color: #2AA876;
+    width: 100%;
+    height: 60px;
+    margin-top: -8px;
+}
+
+.next-stop-2 {
+    background-color: #F19C65;
+    width: 100%;
+    height: 60px;
+    margin-top: -8px;
+}
+
+.next-stop-info {
     font-size: 20px;
     opacity: 0.5;
-    display: inline-block;
-    text-align: left;
     margin: 8px 20px;
+    padding-top: 14px;
 }
 
-.sub-route:hover {
-    opacity: 1;
-    transition: opacity 0.5s linear;
+.next-stop-info > .address > .index {
+    display: none;
 }
 
-.sub-stop-name {
+.next-stop-info > .address {
+    display: inline-block;
+    float: left;
 }
 
-.sub-stop-dist {
+.next-stop-info:hover {
+    opacity: .8;
+}
+
+.next-stop-info > .distance {
+    display: none;
+}
+
+.next-stop-info:hover > .distance {
+    display: inline-block;
+    float: right;
+    padding-right: 10px;
     margin-left: 10px;
+    opacity: 0.5;
 }
 
-
-
-.container, h1 {
-    /*font-family: 'Gudea', sans-serif;*/
-}
+/* ------------------------------------------------------------------------- */
 
 #map-canvas {
-    margin-top: 230px;
-    height: 480px;
-    width: 100%;
+    margin-top: 60px;
+    height: 430px;
+    width: 80%;
     position: absolute; 
+    float: left;
     z-index: 0;
-}
-
-.container {
-    padding: 0;
 }
 
 footer {
@@ -306,12 +320,10 @@ footer {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 60px;
-    z-index: 10;
+    height: 47px;
+    z-index: 5;
     font-size: 18px;
-    padding-top: 10px;
+    padding-top: 11px;
     padding-left: 20px;
-    margin-top: 30px;
+    margin-bottom: -521px;
 }
-
-

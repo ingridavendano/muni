@@ -1,138 +1,84 @@
 {% extends 'master.html' %}
 {% block body %}
 <div class="muni-data"> 
-  <div id="closest-stop"></div>
-  <div id="next-closest-stops"></div>
+  <div id="active-stop"></div>
+  <div id="map-canvas"/>
 </div>
 
-<!-- 
-  <div class="departure-sub-1">
-    <div class="route">
-      <div class="sub-stop-name">Church &amp; 29th (0.1 m)</div>
+<!-- nearets MUNI stop -->
+<script type="text/html" id='active-stop-tmpl'>
+<div class="muni-stops-data">
+  <div class="color-<%= stop.index%3 %>">
+    <div class="stop-info">
+    <div class="address"><%= stop.name %></div>
+    <div class="pagination">
+      <ul class="color-<%= stop.index%3 %>">
+      <% _.each(stop.routes, function(route) { %>
+        <% if(route.index == i) { %>
+        <li class="inactive">
+        <% } else { %>
+        <li class="active">
+        <% } %>
+        <a href="#<%= route.code %>">
+          <span class="index"><%= route.index %></span>
+          <span class="route-code"><%= route.code %></span>
+        </a>
+        </li>
+      <% }); %>
+      </ul>
     </div>
-  </div>  
-  
-  <div class="departure-sub-2">
-    <div class="route">
-      <div class="sub-stop-name">Church &amp; 24th (0.3 m)</div>
-    </div>
-  </div> -->
-<div id="map-canvas"/>
+    <div class="distance"><%= stop.distance %> mi</div>
+  </div>
 
-<script type="text/html" id='closest-stop-tmpl'>
-  <div class="departure-main">
+  <div class="departure-info color-<%= stop.index%3 %>">
+    <div class="time">
+      <div class="amount"><%= stop.routes[i].departures[j].times[0] %></div>
+      <div class="minutes">
+      <% if (stop.routes[i].departures[j].times[0] == '1') { %> 
+        minute
+      <% } else { %>
+        minutes
+      <% } %>
+      </div>
+    </div>
     <div class="route">
-      <div class="stop-name"><%= stop.name %></div>
-      <div class="pagination">
-        <ul>
-          <% _.each(stop.routes, function(route) { %>
-            <li class="active">
-              <a href="#fakelink">
-                <span class="route-code"><%= route.code %></span>
-                <span class="route-mins"><%= route.departures[0].times[0] %> 
-                <% if (route.departures[0].times[0] == '1') { %> 
-                  min
-                <% } else { %>
-                  mins
-                <% } %>
-                </span>
-              </a>
-            </li>
-          <% }); %>
-        </ul>
-      </div>
-      <div class="stop-dist"><%= stop.distance %></div>
+      <div class="name"><%= stop.routes[i].line %></div>
+      <div class="destination"><%= stop.routes[i].departures[j].destination %></div>
     </div>
-    </div>
-    <div class="route-departure-time">
-      <div class="current-route">
-        <div class="time">
-          <% if (stop.routes[0].departures[0].times[0] == 'N/A') { %>
-            <div class="time-amount" style="font-size: 180px; padding-bottom: 10px;">no</div>
-            <div class="time-minutes">muni</div>
-          <% } else { %>
-            <div class="time-amount"><%= stop.routes[0].departures[0].times[0] %></div>
-            <% if (stop.routes[0].departures[0].times[0] == '1') { %> 
-              <div class="time-minutes">minute</div>
-            <% } else { %>
-              <div class="time-minutes">minutes</div>
-            <% } %>
-          <% } %>
-        </div>
-        <div class="route-departure-info">
-          <div class="route-departure-name"><%= stop.routes[0].line %></div>
-        </div>
-        <div class="current-route-direction"><%= stop.routes[0].departures[0].destination %></div>
-        <div class="other-route-0">
-          <div class="route-direction">
-            <% if (stop.routes[0].departures[0].direction == "inbound") { %>
-              <span class="fui-arrow-right inbound"></span>
-              <span class="fui-arrow-right outbound dim-direction"></span>
-            <% } else { %>
-              <span class="fui-arrow-right inbound dim-direction"></span>
-              <span class="fui-arrow-right outbound"></span>
-            <% } %>
-          </div>
-          <div class="route-name">
-            <span class="route-name-abbr"><%= stop.routes[0].code %></span>
-            <span class="route-name-dir"><%= stop.routes[0].departures[0].direction %></span>
-          </div>
-          <div class="change-direction">
-            <span class="glyphicon glyphicon-sort"></span>
-          </div>
+    <div class="direction">
+      <div class="arrows">
+        <% if (stop.routes[i].departures[j].direction == "inbound") { %>
+        <span class="fui-arrow-right inbound"></span>
+        <span class="fui-arrow-right outbound dim-direction"></span>
+        <% } else { %>
+        <span class="fui-arrow-right inbound dim-direction"></span>
+        <span class="fui-arrow-right outbound"></span>
+        <% } %>
+        <div class="route-name">
+          <span class="abbrivation"><%= stop.routes[i].code %></span>
+          <span class="orientation"><%= stop.routes[i].departures[j].direction %></span>
         </div>
       </div>
-      <div class="other-routes-at-stop"></div>
+      <% if (stop.routes[i].departures.length > 1) { %>
+      <div class="change"><span class="glyphicon glyphicon-sort"></span></div>
+      <% } %>
     </div>
   </div>
-</script>
 
-<!-- Other viable stops. -->
-<script type="text/html" id='next-closest-stop-tmpl'>
-  <div class="departure-sub-<%= stop.index %>">
-    <div class="sub-route">
-      <span class="sub-stop-name"><%= stop.name %></span><span class="sub-stop-dist">(<%= stop.distance %> mi)</span>
+  <% _.each(otherStops, function(other) { %>
+  <% if (typeof(other) != "undefined") { %>
+  <div class="next-stop color-<%= other.attributes.index % 3 %>">
+    <div class="next-stop-info">
+      <div class="address"><div class="index"><%= other.attributes.index %></div><%= other.attributes.name %></div>
+      <div class="routes"></div>
+      <div class="distance"><%= other.attributes.distance %> mi</div>
     </div>
-  </div> 
+  </div>
+  <% } %> 
+  <% }) %>
+</div>
 </script>
 
-
-<script type="text/html" id='next-closest-stop-tmpl-2'>
-    // <div class="other-route-1">
-    //   <div class="other-route-name">2-Clement</div>
-    //   <div class="other-route-time">
-    //     <div class="other-time-amount">13 </div>
-    //     <div class="other-time-minutes">mins</div>
-    //   </div>
-    // </div>
-</script>
-
-<!--     // <div class="other-route-2">
-    //   <div class="other-route-name">3-Jackson</div>
-    //   <div class="other-route-time">
-    //     <div class="other-time-amount">9 </div>
-    //     <div class="other-time-minutes">mins</div>
-    //   </div>
-    // </div> -->
-
-
-
-<script type="text/javascript" src="./static/js/departures.js"></script>
-<script type="text/javascript">
-
-
-  // function initialize() {
-  //   var mapOptions = {
-  //     center: new google.maps.LatLng(37.76, -122.44),
-  //     zoom: 18
-  //   };
-  //   var map = new google.maps.Map(document.getElementById("map-canvas"),
-  //       mapOptions);
-  // }
-  // google.maps.event.addDomListener(window, 'load', initialize);
-</script>
-
-
-
+<script type="text/javascript" src="./static/js/muni.js"></script>
 
 {% endblock %}
