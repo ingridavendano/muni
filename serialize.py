@@ -13,11 +13,12 @@ from math import *
 
 def get_distance(stop):
     """ Calculate the distance in miles using Haversine formula. """
-    lat = radians(float(stop.lat))
-    lng = radians(float(stop.lng))
+    lat = radians(float(stop.lat_str))
+    lng = radians(float(stop.lng_str))
 
     distance = cos(LAT)*cos(lat)*cos(lng - LNG) + sin(LAT)*sin(lat)
     return 3959*acos(distance)
+
 
 def add_distance(routes):
     """ Calculate the distance in miles for user to view. """
@@ -28,7 +29,9 @@ def add_distance(routes):
             if largest_distance < course['dist']:
                 largest_distance = course['dist']
 
+    # only return two decimals place
     return '%.2f'%largest_distance
+
 
 def organize_course(name):
     """ Remove inbound and outbound details to a course. """
@@ -49,10 +52,11 @@ def add_course(stop, route):
         'direction': route_direction[0],
         'destination': route_direction[1], 
         'times': [time.text for time in route[0][0][0][0][0]], 
-        'lat': stop.lat, 
-        'lng': stop.lng, 
+        'lat': float(stop.lat_str), 
+        'lng': float(stop.lng_str), 
         'dist': get_distance(stop)
     }
+
 
 def sort_routes(routes):
     """ Reorganize routes listed in order of soonest time to appear. """
@@ -93,6 +97,23 @@ def organize_route_name(name):
     return name[0] + ' - ' + name[1]
 
 
+def index_sort_routes(routes): 
+    """ Give an index for each route. """
+    index = 0
+    organized_routes = []
+
+    for name, departures in routes.iteritems():
+        organized_routes.append({
+            'line': organize_route_name(name[0]), 
+            'code': name[1], 
+            'departures': sort_routes(departures), 
+            'index': index
+        })
+        index += 1
+
+    return organized_routes
+
+
 def sort_stops(stops):
     """ Get routes for bus stops to show up in ascending order. """ 
     tmp_stops = []
@@ -103,13 +124,7 @@ def sort_stops(stops):
         distance = add_distance(routes)
         tmp_stops.append({
             'name': name,  
-            'routes': [
-                {
-                'line': organize_route_name(name[0]), 
-                'code': name[1], 
-                'departures': sort_routes(departures)} 
-                    for name, departures in routes.iteritems()
-                ], 
+            'routes': index_sort_routes(routes),
             'distance': distance
             })
         organize_by_distances.append(distance)
@@ -124,8 +139,15 @@ def sort_stops(stops):
         stop['lng'] = clean_up_routes[2]
 
         i = organize_by_distances.index(stop['distance'])
-
         organize_by_distances[i] = stop
+
+    # remove dead stops
+    for stop in organize_by_distances[:]:
+        if stop['lat'] == 0 and stop['lng'] == 0:
+            organize_by_distances.remove(stop)
+
+    for i in range(len(organize_by_distances)):
+        organize_by_distances[i]['index'] = i
 
     return organize_by_distances
 
@@ -191,7 +213,7 @@ class DepartureEncoder(json.JSONEncoder):
             'id': stop.code,
             'name': stop.address,
             'lat': float(stop.lat),
-            'lng': stop.lng, 
+            'lng': flost(stop.lng), 
             'distance': get_distance(stop), 
             'departures': [
                 stop_data(route) for route in departures
@@ -228,11 +250,6 @@ def to_json(stops, latitude, longitude, debug=False):
         )
 
     # for debugging purposes to be able to look back at muni data gathered
-    if debug: 
-        print json_string
-
-        with open('./muni.json', 'w') as json_output_file:
-            json.dump(json_string, json_output_file)
-
+    if debug: print json_string
     
     return json_string

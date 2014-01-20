@@ -46,13 +46,14 @@ def load_muni_stops(db_session, debug=False):
             code=stop, 
             address=muni[stop], 
             lat=coordinates[stop_id][0], 
-            lng=coordinates[stop_id][1]
+            lng=coordinates[stop_id][1], 
+            lat_str=str(coordinates[stop_id][0]), 
+            lng_str=str(coordinates[stop_id][1]),
             )
         db_session.add(new_stop)
 
     return db_session
 
-    
 # -----------------------------------------------------------------------------
 
 def main():
