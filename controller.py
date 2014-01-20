@@ -7,58 +7,34 @@
 
 import model
 import os
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template
 import json
 
 # -----------------------------------------------------------------------------
 
 app = Flask(__name__)
-app.secret_key = "uber_challenge"
+app.secret_key = "hey_gurl_hey"
 
 # grab Google Maps API
-config_file = open("./config.json")
-config_data = json.load(config_file) 
-config_file.close()
-
-GOOGLE_MAPS_TOKEN = config_data["GOOGLE_MAPS"]
+with open("./config.json") as api_key:
+    GOOGLE_MAPS_TOKEN = json.load(api_key)["GOOGLE_MAPS"]
 
 # -----------------------------------------------------------------------------
 
 @app.route("/", methods=["GET"])
 def index():
-    # return render_template("master.html", token=GOOGLE_MAPS_TOKEN)
-    if session.get("location") and session.get("code"):
-        return render_template("index.html", 
-            display=True, 
-            stop=session["code"], 
-            location=session["location"],
-            token=GOOGLE_MAPS_TOKEN
-            )
-    else: 
-        return render_template("index.html", display=False, stop="", location="")
+    """ Render template to include Google API key. """ 
+    return render_template("index.html", token=GOOGLE_MAPS_TOKEN)
 
-
-@app.route("/map", methods=["GET"])
-def map():
-    return render_template("map.html", token=GOOGLE_MAPS_TOKEN)
-
-
-@app.route("/getTimes.json", methods=["GET"])
-def geo():
-    latitude = request.args.get('lat')
-    longitude = request.args.get('lng')
-
-    session["location"] = (latitude, longitude)
-    json_departures = model.geo_fence(latitude, longitude)
-
-    return json_departures
 
 @app.route("/lat/<latitude>/lng/<longitude>/rad/<radius>/stops")
 def nearest_muni_departures(latitude, longitude, radius): 
+    """ Grab JSON data that being fetch from Backbone. """
     json_departures = model.geo_fence(latitude, longitude, radius)
     return json_departures
 
 # -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv('CIRCUIT_PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

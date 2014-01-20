@@ -64,14 +64,23 @@ class Stop(Base):
     id = Column(Integer, primary_key=True)
     code = Column(String(6), nullable=False)
     address = Column(String(40), nullable=False)
-    lat = Column(Float, nullable=False)
-    lng = Column(Float, nullable=False)
+    lat = Column(Float(precision=10), nullable=False)
+    lng = Column(Float(precision=10), nullable=False)
+    lat_str = Column(String(20), nullable=False)
+    lng_str = Column(String(20), nullable=False)
 
 # -----------------------------------------------------------------------------
 
 def create_stop(code, name, latitude, longitude):
     """ Creates new MUNI stop in database. """
-    new_stop = Stop(code=code, address=name, lat=latitude, lng=longitude)
+    new_stop = Stop(
+        code=code, 
+        address=name, 
+        lat=latitude, 
+        lng=longitude,
+        lat_str=str(latitude), 
+        lng_str=str(longitude),
+        )
     db_session.add(new_stop)
     db_session.commit()
     return
@@ -83,9 +92,7 @@ def get_stop(code):
     return stop
 
 
-def geo_fence(latitude, longitude, radius, limit=4):
-    # latitude = str(37.78651)
-    # longitude = str(-122.40157)
+def geo_fence(latitude, longitude, radius, limit=8):
     """ Finds closest MUNI stop in database by a user's geolocation. """
     equation = "".join(["( 3959 * acos( cos( radians(",
         latitude,
