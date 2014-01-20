@@ -39,6 +39,7 @@ Things to improve
 * Refactor how JSON was encoded from the database to frontend.
 * Allow a user to move the map and drag the pin marker to a new location to find alternative MUNI times. 
 * Provide more departure times (when available) for routes.
+* ~~Provide loading screen.~~
 
 
 Extras

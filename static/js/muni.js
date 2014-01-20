@@ -114,6 +114,8 @@ var StopsView = Backbone.View.extend({
  * ------------------------------------------------------------------------- */
 
 function success(position) {
+    $(".geolocation-loading").html("loading data...");
+
     latitude = position.coords.latitude;
     longitude = position.coords.longitude;
     var radius = 15;
@@ -203,7 +205,7 @@ function error(msg) {
 
 // prompts the user for geolocation data 
 if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(success, error);
+    // navigator.geolocation.getCurrentPosition(success, error);
 } else {
     error("NOT WORKING!");
 }

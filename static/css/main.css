@@ -1,5 +1,16 @@
 .container {
     padding: 0;
+    position: relative;
+}
+
+.geolocation-loading {
+    background-color: #E4E4E4;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    height: 474px;
+    padding: 110px 30px;
+    font-size: 80px;
 }
 
 .muni-data {
