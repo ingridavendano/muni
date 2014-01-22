@@ -205,7 +205,7 @@ function error(msg) {
 
 // prompts the user for geolocation data 
 if (navigator.geolocation) {
-    // navigator.geolocation.getCurrentPosition(success, error);
+    navigator.geolocation.getCurrentPosition(success, error);
 } else {
     error("NOT WORKING!");
 }
