@@ -40,7 +40,7 @@ def organize_course(name):
     return ('no direction', name)
 
 
-def add_course(stop, route):
+def add_course(stop, route, LAT, LNG):
     """ Each stop has multiple routes departuring referred to as a course. """
     times = [time.text for time in route[0][0][0][0][0]]
     route_direction = organize_course(route[0][0].get("Name"))
@@ -54,7 +54,7 @@ def add_course(stop, route):
         'times': [time.text for time in route[0][0][0][0][0]], 
         'lat': float(stop.lat_str), 
         'lng': float(stop.lng_str), 
-        'dist': get_distance(stop)
+        'dist': get_distance(stop, LAT, LNG)
     }
 
 
@@ -163,7 +163,7 @@ def organize_name(stop_name):
     return stop_name 
 
 
-def organize_stops(stops, latitude, longitude):
+def organize_stops(stops, latitude, longitude, LAT, LNG):
     """ Reorganize stops into an updated list. """
     update = {} 
 
@@ -180,7 +180,7 @@ def organize_stops(stops, latitude, longitude):
         for route in departures:
             name = route.get("Name")
             code = route.get("Code")
-            course = add_course(stop, route)
+            course = add_course(stop, route, LAT, LNG)
 
             if course is not None: 
                 # add new course to existing route
@@ -195,30 +195,30 @@ def organize_stops(stops, latitude, longitude):
 
 # -----------------------------------------------------------------------------
 
-class DepartureEncoder(json.JSONEncoder):
-    """ Encode XML departure times to JSON. """
+# class DepartureEncoder(json.JSONEncoder):
+#     """ Encode XML departure times to JSON. """
 
-    def default(self, stop):
-        def stop_data(route):
-            return {
-                'route': route.get("Name"),
-                'direction': route[0][0].get("Name"),
-                'times': [time.text for time in route[0][0][0][0][0]]
-            }
+#     def default(self, stop):
+#         def stop_data(route):
+#             return {
+#                 'route': route.get("Name"),
+#                 'direction': route[0][0].get("Name"),
+#                 'times': [time.text for time in route[0][0][0][0][0]]
+#             }
 
-        # get XML of departures leaving from stop 
-        departures = deserialize.get_departures(stop.code)
+#         # get XML of departures leaving from stop 
+#         departures = deserialize.get_departures(stop.code)
 
-        return {
-            'id': stop.code,
-            'name': stop.address,
-            'lat': float(stop.lat),
-            'lng': flost(stop.lng), 
-            'distance': get_distance(stop), 
-            'departures': [
-                stop_data(route) for route in departures
-            ]
-        }
+#         return {
+#             'id': stop.code,
+#             'name': stop.address,
+#             'lat': float(stop.lat),
+#             'lng': flost(stop.lng), 
+#             'distance': get_distance(stop), 
+#             'departures': [
+#                 stop_data(route) for route in departures
+#             ]
+#         }
 
 # -----------------------------------------------------------------------------
 
@@ -226,8 +226,8 @@ def to_json(stops, latitude, longitude, debug=False):
     """ Converts data about a MUNI stop into JSON. """
     if stops is None: return None
 
-    global LAT
-    global LNG
+    # global LAT
+    # global LNG
 
     LAT = radians(float(latitude))
     LNG = radians(float(longitude))
@@ -240,7 +240,7 @@ def to_json(stops, latitude, longitude, debug=False):
     #     separators=(',', ': ')
     #     )
 
-    updated_stops = organize_stops(stops, latitude, longitude)
+    updated_stops = organize_stops(stops, latitude, longitude, LAT, LNG)
 
     # organized stops, above code also works too
     json_string = json.dumps(updated_stops,

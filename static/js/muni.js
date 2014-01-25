@@ -118,7 +118,7 @@ function success(position) {
 
     latitude = position.coords.latitude;
     longitude = position.coords.longitude;
-    var radius = 15;
+    var radius = 30;
 
     // sync geolation to Coords collection
     coords = new Coords({lat:latitude, lng:longitude, rad:radius});
