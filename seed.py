@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
-# seed.py 
-# Created by Ingrid Avendano 1/8/14. 
+# seed.py
+# Created by Ingrid Avendano 1/8/14.
 # -----------------------------------------------------------------------------
 # Populate MySQL database with SF-MUNI stop latitude/longitude data.
 # -----------------------------------------------------------------------------
@@ -8,10 +8,9 @@
 import model
 import deserialize
 
-# -----------------------------------------------------------------------------
 
 def get_geolocations():
-    """ Map stop_id to geolocations of every SF-MUNI stop from text file. """
+    """Map stop_id to geolocations of every SF-MUNI stop from text file."""
     coordinates = {}
 
     with open("./data/stops.txt") as data:
@@ -19,7 +18,7 @@ def get_geolocations():
 
         for stop in stops:
             stop = stop.split(",")
-            try: 
+            try:
                 stop_id = int(stop[0])
                 latitude = stop[3]
                 longitude = stop[4]
@@ -33,28 +32,28 @@ def get_geolocations():
 
 
 def load_muni_stops(db_session, debug=False):
-    """ Loads information about each SF-MUNI stop into the database. """
+    """Loads information about each SF-MUNI stop into the database."""
     coordinates = get_geolocations()
     muni = deserialize.muni()
 
-    for stop in muni.keys(): 
+    for stop in muni.keys():
         stop_id = int(stop[-4:])
 
-        if debug: print stop, muni[stop], coordinates[stop_id]
+        if debug:
+            print stop, muni[stop], coordinates[stop_id]
 
         new_stop = model.Stop(
-            code=stop, 
-            address=muni[stop], 
-            lat=coordinates[stop_id][0], 
-            lng=coordinates[stop_id][1], 
-            lat_str=str(coordinates[stop_id][0]), 
+            code=stop,
+            address=muni[stop],
+            lat=coordinates[stop_id][0],
+            lng=coordinates[stop_id][1],
+            lat_str=str(coordinates[stop_id][0]),
             lng_str=str(coordinates[stop_id][1]),
             )
         db_session.add(new_stop)
 
     return db_session
 
-# -----------------------------------------------------------------------------
 
 def main():
     db_session = model.connect()
@@ -64,4 +63,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

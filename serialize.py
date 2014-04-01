@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# serialize.py 
+# serialize.py
 # Created by Ingrid Avendano 1/12/14.
 # -----------------------------------------------------------------------------
 # Useful functions to write data into JSON.
@@ -9,10 +9,9 @@ import json
 import deserialize
 from math import *
 
-# -----------------------------------------------------------------------------
 
 def get_distance(stop):
-    """ Calculate the distance in miles using Haversine formula. """
+    """Calculate the distance in miles using Haversine formula."""
     lat = radians(float(stop.lat_str))
     lng = radians(float(stop.lng_str))
 
@@ -21,9 +20,9 @@ def get_distance(stop):
 
 
 def add_distance(routes):
-    """ Calculate the distance in miles for user to view. """
+    """Calculate the distance in miles for user to view."""
     largest_distance = 0.0
-  
+
     for courses in routes.values():
         for course in courses:
             if largest_distance < course['dist']:
@@ -34,32 +33,37 @@ def add_distance(routes):
 
 
 def organize_course(name):
-    """ Remove inbound and outbound details to a course. """
-    if 'Outbound ' in name: return ('outbound', name[9:])
-    if 'Inbound ' in name: return ('inbound', name[8:])
+    """Remove inbound and outbound details to a course."""
+    if 'Outbound ' in name:
+        return ('outbound', name[9:])
+
+    if 'Inbound ' in name:
+        return ('inbound', name[8:])
+
     return ('no direction', name)
 
 
 def add_course(stop, route, LAT, LNG):
-    """ Each stop has multiple routes departuring referred to as a course. """
+    """Each stop has multiple routes departuring referred to as a course."""
     times = [time.text for time in route[0][0][0][0][0]]
     route_direction = organize_course(route[0][0].get("Name"))
 
     # don't bother adding muni route if no muni is coming
-    if len(times) == 0: return None
-    
+    if len(times) == 0:
+        return None
+
     return {
         'direction': route_direction[0],
-        'destination': route_direction[1], 
-        'times': [time.text for time in route[0][0][0][0][0]], 
-        'lat': float(stop.lat_str), 
-        'lng': float(stop.lng_str), 
-        'dist': get_distance(stop, LAT, LNG)
+        'destination': route_direction[1],
+        'times': [time.text for time in route[0][0][0][0][0]],
+        'lat': float(stop.lat_str),
+        'lng': float(stop.lng_str),
+        'dist': get_distance(stop, LAT, LNG),
     }
 
 
 def sort_routes(routes):
-    """ Reorganize routes listed in order of soonest time to appear. """
+    """Reorganize routes listed in order of soonest time to appear."""
     organize_by_times = []
 
     for route in routes:
@@ -77,7 +81,7 @@ def sort_routes(routes):
 
 
 def remove_lat_lng(routes):
-    """ Get rid of repetitive latitude/longitude data. """
+    """Get rid of repetitive latitude/longitude data."""
     lat = lng = 0
 
     for route in routes:
@@ -92,22 +96,22 @@ def remove_lat_lng(routes):
 
 
 def organize_route_name(name):
-    """ Provide proper dash in how name is represented. """
+    """Provide proper dash in how name is represented."""
     name = name.split('-')
     return name[0] + ' - ' + name[1]
 
 
-def index_sort_routes(routes): 
-    """ Give an index for each route. """
+def index_sort_routes(routes):
+    """Give an index for each route."""
     index = 0
     organized_routes = []
 
     for name, departures in routes.iteritems():
         organized_routes.append({
-            'line': organize_route_name(name[0]), 
-            'code': name[1], 
-            'departures': sort_routes(departures), 
-            'index': index
+            'line': organize_route_name(name[0]),
+            'code': name[1],
+            'departures': sort_routes(departures),
+            'index': index,
         })
         index += 1
 
@@ -115,7 +119,7 @@ def index_sort_routes(routes):
 
 
 def sort_stops(stops):
-    """ Get routes for bus stops to show up in ascending order. """ 
+    """Get routes for bus stops to show up in ascending order."""
     tmp_stops = []
     organize_by_distances = []
 
@@ -123,9 +127,9 @@ def sort_stops(stops):
     for name, routes in stops.iteritems():
         distance = add_distance(routes)
         tmp_stops.append({
-            'name': name,  
+            'name': name,
             'routes': index_sort_routes(routes),
-            'distance': distance
+            'distance': distance,
             })
         organize_by_distances.append(distance)
 
@@ -153,25 +157,25 @@ def sort_stops(stops):
 
 
 def organize_name(stop_name):
-    """ Return name that is easy to organize routes by stop. """
+    """Return name that is easy to organize routes by stop."""
     cross_streets = sorted(stop_name.split(' & '))
 
     # if cross streets can be reoganized return it
     if len(cross_streets) == 2:
         return cross_streets[0] + ' & ' + cross_streets[1]
 
-    return stop_name 
+    return stop_name
 
 
 def organize_stops(stops, latitude, longitude, LAT, LNG):
-    """ Reorganize stops into an updated list. """
-    update = {} 
+    """Reorganize stops into an updated list."""
+    update = {}
 
     # cannot use JSONEncoder because it doesn't parse properly
     for stop in stops:
         update[organize_name(stop.address)] = {}
 
-    # go through all the stops 
+    # go through all the stops
     for stop in stops:
         location = organize_name(stop.address)
         departures = deserialize.get_departures(stop.code)
@@ -182,12 +186,12 @@ def organize_stops(stops, latitude, longitude, LAT, LNG):
             code = route.get("Code")
             course = add_course(stop, route, LAT, LNG)
 
-            if course is not None: 
+            if course is not None:
                 # add new course to existing route
-                if (name,code) in update[location].keys():
-                    update[location][(name,code)].append(course)
+                if (name, code) in update[location].keys():
+                    update[location][(name, code)].append(course)
                 else:
-                     update[location][(name,code)] = [course]
+                    update[location][(name, code)] = [course]
 
     organize_by_distances = sort_stops(update)
 
@@ -206,15 +210,15 @@ def organize_stops(stops, latitude, longitude, LAT, LNG):
 #                 'times': [time.text for time in route[0][0][0][0][0]]
 #             }
 
-#         # get XML of departures leaving from stop 
+#         # get XML of departures leaving from stop
 #         departures = deserialize.get_departures(stop.code)
 
 #         return {
 #             'id': stop.code,
 #             'name': stop.address,
 #             'lat': float(stop.lat),
-#             'lng': flost(stop.lng), 
-#             'distance': get_distance(stop), 
+#             'lng': flost(stop.lng),
+#             'distance': get_distance(stop),
 #             'departures': [
 #                 stop_data(route) for route in departures
 #             ]
@@ -222,9 +226,11 @@ def organize_stops(stops, latitude, longitude, LAT, LNG):
 
 # -----------------------------------------------------------------------------
 
+
 def to_json(stops, latitude, longitude, debug=False):
-    """ Converts data about a MUNI stop into JSON. """
-    if stops is None: return None
+    """Converts data about a MUNI stop into JSON."""
+    if stops is None:
+        return None
 
     # global LAT
     # global LNG
@@ -243,13 +249,15 @@ def to_json(stops, latitude, longitude, debug=False):
     updated_stops = organize_stops(stops, latitude, longitude, LAT, LNG)
 
     # organized stops, above code also works too
-    json_string = json.dumps(updated_stops,
+    json_string = json.dumps(
+        updated_stops,
         sort_keys=True,
         indent=4,
-        separators=(',', ': ')
+        separators=(',', ': '),
         )
 
     # for debugging purposes to be able to look back at muni data gathered
-    if debug: print json_string
-    
+    if debug:
+        print json_string
+
     return json_string
